@@ -12,7 +12,7 @@ QuickBuilder can create builders for pretty much any class - it cleanly handle i
 
 ## 60 second quickstart
 
-For any bean
+For any bean e.g.
 
 ```java
 public class Person {
@@ -47,13 +47,13 @@ interface PersonBuilder extends Builder<Person> {
 
 ```
 
-And use it like any other builder
+Get an instance by calling QB.builder, then use it like any other builder
 
 ```java
     Person p = QB.builder(PersonBuilder.class).withName("Bob").withAge(42).build();
 ```
 
-For non beans you can supply a "seed" function to create the type
+For classes without a public non no-args constructor you can supply a "seed" function that creates the instance.
 
 ```java
  class Seed implements Generator<Person, PersonBuilder> {
@@ -63,10 +63,11 @@ For non beans you can supply a "seed" function to create the type
     }
  }
 
+ // pass an instance of the seed function to QuickBuilder
  PersonBuilder pb = QB.builder(PersonBuilder.class, new Seed());
 ```
 
-You can declare that you will take responsibility for a property by declaring an underscore method in your builder.
+For classes that don't provide setter methods (e.g immutable classes) you can tell QuickBuilder that you will take responsibility for a property by declaring an underscore method in your builder.
 
 ```java
 interface PersonBuilder extends Builder<Person> {
@@ -74,11 +75,12 @@ interface PersonBuilder extends Builder<Person> {
   PersonBuilder withAge(int age);
   PersonBuilder withPartner(PersonBuilder partner);
 
+  // underscore method telling QuickBuilder not to handle this property
   String _Name();
 }
 ```
 
-And then use this method in your seed function to route the value to the right place.
+The underscore method can then be used in your seed function to route the value to the right place.
 
 ```java
  class Seed implements Generator<Person, PersonBuilder> {
@@ -92,10 +94,11 @@ And then use this method in your seed function to route the value to the right p
 
 ## Features
 
-* Creates builders for beans by defining interface only
-* Creates builders for non-beans (eg immutable classes) by defining interface and small seeder function
+* Automatically creates builders for beans - you just supply an interface
+* Creates builders for non-beans (e.g. immutable classes) by defining interface and small seeder function
 * Builder methods may take normal types or other builders as parameters
 * Builders return shallow copies of themselves - no need for special "but" methods
+* Supports any lowercase prefix for property methods eg "withName", "andName", "usingName"
 
 ## Design principles
 
@@ -105,6 +108,5 @@ And then use this method in your seed function to route the value to the right p
 
 ## TODO
 
-* Support any lower case prefix for properties
-* Seperate interface for underscore methods
+* Separate interface for underscore methods
 * Collect list entries individually
