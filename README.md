@@ -60,7 +60,7 @@ For classes without a public non no-args constructor you can supply a "seed" fun
 ```java
  class Seed implements Generator<Person, PersonBuilder> {
     @Override
-    public FruitBean generate(PersonBuilder builder) {
+    public Person generate(PersonBuilder builder) {
       return Person.create();
     }
  }
@@ -87,7 +87,7 @@ The underscore method can then be used in your seed function to route the value 
 ```java
  class Seed implements Generator<Person, PersonBuilder> {
     @Override
-    public FruitBean generate(PersonBuilder builder) {
+    public Person generate(PersonBuilder builder) {
       return Person.create(builder._Name());
     }
  }
@@ -112,3 +112,13 @@ The underscore method can then be used in your seed function to route the value 
 
 * Separate interface for underscore methods
 * Collect list entries individually
+* Auto generation for classes with single factory method
+* Auto generation for classes with constructor without repeated types
+
+## Alternatives
+
+Other approaches you might want to consider
+
+* https://code.google.com/p/make-it-easy/ 
+* http://code.google.com/a/eclipselabs.org/p/bob-the-builder/
+

@@ -6,6 +6,71 @@
 	<artifactId>quickbuilder</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
+	<url>http://pitest.org</url>
+	<description>Generates implementations of the Builder Pattern at runtime.</description>
+	<scm>
+		<url>https://github.com/hcoles/QuickBuilder</url>
+		<connection>scm:git:git@github.com:hcoles/QuickBuilder.git</connection>
+		<developerConnection>scm:git:git@github.com:hcoles/QuickBuilder.git</developerConnection>
+	</scm>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<issueManagement>
+		<url>https://github.com/hcoles/QuickBuilder/issues</url>
+		<system>GitHub</system>
+	</issueManagement>
+
+	<developers>
+		<developer>
+			<id>henry</id>
+			<name>Henry Coles</name>
+			<email>henry@pitest.org</email>
+		</developer>
+	</developers>
+
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
+	<profiles>
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+
+		</profile>
+	</profiles>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -17,12 +82,12 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-				<plugin>
+			<plugin>
 				<groupId>org.pitest</groupId>
 				<artifactId>pitest-maven</artifactId>
 				<version>0.33</version>
 				<executions>
-				    <!-- bound here to test, most commonly bound to verify -->
+					<!-- bound here to test, most commonly bound to verify -->
 					<execution>
 						<id>verify</id>
 						<phase>verify</phase>
@@ -45,13 +110,13 @@
 			<artifactId>asm-debug-all</artifactId>
 			<version>5.0.1</version>
 		</dependency>
-		
+
 		<dependency>
-	<groupId>com.googlecode.gentyref</groupId>
-	<artifactId>gentyref</artifactId>
-	<version>1.1.0</version>
-</dependency>
-            
+			<groupId>com.googlecode.gentyref</groupId>
+			<artifactId>gentyref</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>junit</groupId>
