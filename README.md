@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/hcoles/QuickBuilder.svg?branch=master)](https://travis-ci.org/hcoles/QuickBuilder)
+
 # QuickBuilder
 
 Builders without boiler plate. 
