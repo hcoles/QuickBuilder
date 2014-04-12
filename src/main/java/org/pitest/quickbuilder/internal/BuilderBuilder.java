@@ -1,10 +1,12 @@
 package org.pitest.quickbuilder.internal;
 
 import static org.objectweb.asm.Opcodes.ACC_BRIDGE;
+import static org.objectweb.asm.Opcodes.ACC_FINAL;
 import static org.objectweb.asm.Opcodes.ACC_PRIVATE;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.ACC_SUPER;
 import static org.objectweb.asm.Opcodes.ACC_SYNTHETIC;
+import static org.objectweb.asm.Opcodes.ACONST_NULL;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.ARETURN;
 import static org.objectweb.asm.Opcodes.ASTORE;
@@ -244,8 +246,15 @@ class BuilderBuilder {
     mv.visitCode();
 
     mv.visitVarInsn(ALOAD, 0);
-    mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V",
-        false);
+    mv.visitInsn(ACONST_NULL);
+
+    for (int i = 0; i != this.uniqueProperties().size(); i++) {
+      mv.visitInsn(ACONST_NULL);
+    }
+
+    mv.visitMethodInsn(INVOKESPECIAL, this.builderName, "<init>",
+        this.initDescriptor(), false);
+
     mv.visitInsn(RETURN);
     mv.visitMaxs(1, 1);
     mv.visitEnd();
@@ -266,9 +275,10 @@ class BuilderBuilder {
   }
 
   private void createFields(final ClassWriter cw) {
-    final FieldVisitor fv1 = cw.visitField(ACC_PRIVATE, GENERATOR_FIELD, "L"
-        + GENERATOR_INTERFACE + ";", "L" + GENERATOR_INTERFACE + "<L"
-        + this.built + ";L" + this.builderName + ";>;", null);
+    final FieldVisitor fv1 = cw.visitField(ACC_PRIVATE + ACC_FINAL,
+        GENERATOR_FIELD, "L" + GENERATOR_INTERFACE + ";", "L"
+            + GENERATOR_INTERFACE + "<L" + this.built + ";L" + this.builderName
+            + ";>;", null);
     fv1.visitEnd();
 
     final Set<Property> uniquePs = uniqueProperties();

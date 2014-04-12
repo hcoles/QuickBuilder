@@ -9,7 +9,7 @@ public class PrimitiveBeanBuilderImpl implements PrimitiveBeanBuilder {
   
   private  Generator<PrimitiveBean, PrimitiveBeanBuilder> g;
   
-  private  Builder<Integer> i;
+  private final Builder<Integer> i;
   private  Builder<Boolean> b;
   private  Builder<Byte> by;
   private  Builder<Character> c;
