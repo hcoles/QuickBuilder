@@ -1,21 +1,35 @@
 package com.example.beans.primitives;
 
 import org.pitest.quickbuilder.Builder;
+import org.pitest.quickbuilder.Generator;
 import org.pitest.quickbuilder.QuickBuilderError;
 import org.pitest.quickbuilder.internal.StoredValueBuilder;
 
 public class PrimitiveBeanBuilderImpl implements PrimitiveBeanBuilder {
   
-  private Builder<Integer> i;
-  private Builder<Boolean> b;
-  private Builder<Byte> by;
-  private Builder<Character> c;
-  private Builder<Double> d;
-  private Builder<Float> f;
-  private Builder<Long> l;
-  private Builder<Short> s;
-  private Builder<byte[]> ba;
+  private  Generator<PrimitiveBean, PrimitiveBeanBuilder> g;
+  
+  private  Builder<Integer> i;
+  private  Builder<Boolean> b;
+  private  Builder<Byte> by;
+  private  Builder<Character> c;
+  private  Builder<Double> d;
+  private  Builder<Float> f;
+  private  Builder<Long> l;
+  private  Builder<Short> s;
+  private  Builder<byte[]> ba;
 
+  public PrimitiveBeanBuilderImpl(Generator<PrimitiveBean, PrimitiveBeanBuilder> g, Builder<Integer> i,Builder<Boolean> b, Builder<Long> l   ) {
+    this.g = g;
+    this.i = i;
+    this.b = b;
+    this.l = l;
+  }
+  
+  public PrimitiveBeanBuilderImpl() {
+    this(null,null,null,null);
+  }
+  
   @Override
   public PrimitiveBean build() {
     PrimitiveBean pb = new PrimitiveBean();
@@ -37,8 +51,7 @@ public class PrimitiveBeanBuilderImpl implements PrimitiveBeanBuilder {
 
   @Override
   public PrimitiveBeanBuilder withI(int i) {
-    this.i = new StoredValueBuilder<Integer>(i);
-    return this;
+    return new PrimitiveBeanBuilderImpl(this.g, new StoredValueBuilder<Integer>(i), b, l);
   }
   
   public int _I() {
@@ -54,8 +67,7 @@ public class PrimitiveBeanBuilderImpl implements PrimitiveBeanBuilder {
 
   @Override
   public PrimitiveBeanBuilder withL(long l) {
-    this.l = new StoredValueBuilder<Long>(l);
-    return this;
+    return new PrimitiveBeanBuilderImpl(this.g, i, b, new StoredValueBuilder<Long>(l));
   }
 
   @Override

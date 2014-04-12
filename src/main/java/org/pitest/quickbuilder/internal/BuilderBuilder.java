@@ -1,6 +1,6 @@
 package org.pitest.quickbuilder.internal;
 
-import static org.objectweb.asm.Opcodes.*;
+import static org.objectweb.asm.Opcodes.ACC_BRIDGE;
 import static org.objectweb.asm.Opcodes.ACC_PRIVATE;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.ACC_SUPER;
@@ -8,19 +8,22 @@ import static org.objectweb.asm.Opcodes.ACC_SYNTHETIC;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.ARETURN;
 import static org.objectweb.asm.Opcodes.ASTORE;
+import static org.objectweb.asm.Opcodes.ATHROW;
 import static org.objectweb.asm.Opcodes.CHECKCAST;
 import static org.objectweb.asm.Opcodes.DUP;
 import static org.objectweb.asm.Opcodes.GETFIELD;
 import static org.objectweb.asm.Opcodes.GOTO;
+import static org.objectweb.asm.Opcodes.IFNONNULL;
 import static org.objectweb.asm.Opcodes.IFNULL;
 import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.NEW;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
 import static org.objectweb.asm.Opcodes.RETURN;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -94,8 +97,17 @@ class BuilderBuilder {
     mv.visitTypeInsn(NEW, this.builderName);
     mv.visitInsn(DUP);
     mv.visitVarInsn(ALOAD, 0);
-    mv.visitMethodInsn(INVOKESPECIAL, this.builderName, "<init>", "(L"
-        + this.builderName + ";)V", false);
+    mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD,
+        "Lorg/pitest/quickbuilder/Generator;");
+
+    for (final Property each : this.uniqueProperties()) {
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitFieldInsn(GETFIELD, this.builderName, each.name(),
+          "Lorg/pitest/quickbuilder/Builder;");
+    }
+
+    mv.visitMethodInsn(INVOKESPECIAL, this.builderName, "<init>",
+        this.initDescriptor(), false);
     mv.visitInsn(ARETURN);
 
     mv.visitMaxs(1, 1);
@@ -104,31 +116,50 @@ class BuilderBuilder {
   }
 
   private void createCopyConstructor(final ClassWriter cw) {
-    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "<init>", "(L"
-        + this.builderName + ";)V", null, null);
+    // final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "<init>", "(L"
+    // + this.builderName + ";)V", null, null);
+
+    final StringBuilder sb = new StringBuilder();
+    sb.append("(");
+    sb.append("Lorg/pitest/quickbuilder/Generator<" + this.built + ";L"
+        + this.builderName + ";>;");
+    for (final Property each : this.uniqueProperties()) {
+      sb.append("Lorg/pitest/quickbuilder/Builder<" + each.declaredType()
+          + ">;");
+    }
+    sb.append(";)V");
+    final String sig = sb.toString();
+
+    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "<init>",
+        initDescriptor(), sig, null);
+
     mv.visitVarInsn(ALOAD, 0);
     mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V",
         false);
 
     mv.visitVarInsn(ALOAD, 0);
     mv.visitVarInsn(ALOAD, 1);
-    mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD, "L"
-        + GENERATOR_INTERFACE + ";");
     mv.visitFieldInsn(PUTFIELD, this.builderName, GENERATOR_FIELD, "L"
         + GENERATOR_INTERFACE + ";");
 
+    int index = 2;
     for (final Property each : this.uniqueProperties()) {
       mv.visitVarInsn(ALOAD, 0);
-      mv.visitVarInsn(ALOAD, 1);
-      mv.visitFieldInsn(GETFIELD, this.builderName, each.name(),
-          "Lorg/pitest/quickbuilder/Builder;");
+      mv.visitVarInsn(ALOAD, index);
       mv.visitFieldInsn(PUTFIELD, this.builderName, each.name(),
           "Lorg/pitest/quickbuilder/Builder;");
+      index = index + 1;
     }
 
     mv.visitInsn(RETURN);
     mv.visitMaxs(1, 1);
     mv.visitEnd();
+  }
+
+  private String initDescriptor() {
+    return "(Lorg/pitest/quickbuilder/Generator;"
+        + StringUtils.repeat("Lorg/pitest/quickbuilder/Builder;", this
+            .uniqueProperties().size()) + ")V";
   }
 
   private void createAccessor(final ClassWriter cw, final Property each) {
@@ -139,21 +170,23 @@ class BuilderBuilder {
     mv.visitVarInsn(ALOAD, 0);
     mv.visitFieldInsn(GETFIELD, this.builderName, each.name(),
         "Lorg/pitest/quickbuilder/Builder;");
-    
 
-    Label l = new Label();
+    final Label l = new Label();
     mv.visitJumpInsn(IFNONNULL, l);
     mv.visitTypeInsn(NEW, "org/pitest/quickbuilder/QuickBuilderError");
     mv.visitInsn(DUP);
-    mv.visitLdcInsn("_" + each.name() + "() called, but not value has been set for property " + each.name());
-    mv.visitMethodInsn(INVOKESPECIAL, "org/pitest/quickbuilder/QuickBuilderError", "<init>", "(Ljava/lang/String;)V", false);
+    mv.visitLdcInsn("_" + each.name()
+        + "() called, but not value has been set for property " + each.name());
+    mv.visitMethodInsn(INVOKESPECIAL,
+        "org/pitest/quickbuilder/QuickBuilderError", "<init>",
+        "(Ljava/lang/String;)V", false);
     mv.visitInsn(ATHROW);
-    
+
     mv.visitLabel(l);
     mv.visitVarInsn(ALOAD, 0);
     mv.visitFieldInsn(GETFIELD, this.builderName, each.name(),
         "Lorg/pitest/quickbuilder/Builder;");
-    
+
     mv.visitMethodInsn(INVOKEINTERFACE, "org/pitest/quickbuilder/Builder",
         "build", "()Ljava/lang/Object;", true);
 
@@ -248,7 +281,7 @@ class BuilderBuilder {
   }
 
   private Set<Property> uniqueProperties() {
-    final Set<Property> uniquePs = new HashSet<Property>(this.ps);
+    final Set<Property> uniquePs = new LinkedHashSet<Property>(this.ps);
     return uniquePs;
   }
 
@@ -256,62 +289,97 @@ class BuilderBuilder {
     final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, prop.withMethodName(),
         "(" + prop.declaredType() + ")L" + this.proxiedName + ";", null, null);
     mv.visitCode();
-
-    mv.visitVarInsn(ALOAD, 0);
-
-    if (!prop.isBuilder()) {
-      mv.visitTypeInsn(NEW,
-          "org/pitest/quickbuilder/internal/StoredValueBuilder");
-      mv.visitInsn(DUP);
-      mv.visitVarInsn(prop.loadIns(), 1);
-
-      if (prop.getSort() == Type.INT) {
-        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf",
-            "(I)Ljava/lang/Integer;", false);
-      } else if (prop.getSort() == Type.BOOLEAN) {
-        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "valueOf",
-            "(Z)Ljava/lang/Boolean;", false);
-      } else if (prop.getSort() == Type.BYTE) {
-        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Byte", "valueOf",
-            "(B)Ljava/lang/Byte;", false);
-      } else if (prop.getSort() == Type.SHORT) {
-        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Short", "valueOf",
-            "(S)Ljava/lang/Short;", false);
-      } else if (prop.getSort() == Type.DOUBLE) {
-        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", "valueOf",
-            "(D)Ljava/lang/Double;", false);
-      } else if (prop.getSort() == Type.FLOAT) {
-        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", "valueOf",
-            "(F)Ljava/lang/Float;", false);
-      } else if (prop.getSort() == Type.LONG) {
-        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf",
-            "(J)Ljava/lang/Long;", false);
-      } else if (prop.getSort() == Type.CHAR) {
-        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Character", "valueOf",
-            "(C)Ljava/lang/Character;", false);
-      }
-
-      mv.visitMethodInsn(INVOKESPECIAL,
-          "org/pitest/quickbuilder/internal/StoredValueBuilder", "<init>",
-          "(Ljava/lang/Object;)V", false);
-    } else {
-      mv.visitVarInsn(ALOAD, 1);
-    }
-
-    mv.visitFieldInsn(Opcodes.PUTFIELD, this.builderName, prop.name(),
-        "Lorg/pitest/quickbuilder/Builder;");
-
     mv.visitTypeInsn(NEW, this.builderName);
     mv.visitInsn(DUP);
     mv.visitVarInsn(ALOAD, 0);
-    mv.visitMethodInsn(INVOKESPECIAL, this.builderName, "<init>", "(L"
-        + this.builderName + ";)V", false);
+    mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD,
+        "Lorg/pitest/quickbuilder/Generator;");
+
+    for (final Property each : this.uniqueProperties()) {
+      if (each.name().equals(prop.name())) {
+        if (!prop.isBuilder()) {
+          mv.visitTypeInsn(NEW,
+              "org/pitest/quickbuilder/internal/StoredValueBuilder");
+          mv.visitInsn(DUP);
+          mv.visitVarInsn(prop.loadIns(), 1);
+
+          if (prop.getSort() == Type.INT) {
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf",
+                "(I)Ljava/lang/Integer;", false);
+          } else if (prop.getSort() == Type.BOOLEAN) {
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "valueOf",
+                "(Z)Ljava/lang/Boolean;", false);
+          } else if (prop.getSort() == Type.BYTE) {
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Byte", "valueOf",
+                "(B)Ljava/lang/Byte;", false);
+          } else if (prop.getSort() == Type.SHORT) {
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Short", "valueOf",
+                "(S)Ljava/lang/Short;", false);
+          } else if (prop.getSort() == Type.DOUBLE) {
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", "valueOf",
+                "(D)Ljava/lang/Double;", false);
+          } else if (prop.getSort() == Type.FLOAT) {
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", "valueOf",
+                "(F)Ljava/lang/Float;", false);
+          } else if (prop.getSort() == Type.LONG) {
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf",
+                "(J)Ljava/lang/Long;", false);
+          } else if (prop.getSort() == Type.CHAR) {
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Character", "valueOf",
+                "(C)Ljava/lang/Character;", false);
+          }
+
+          mv.visitMethodInsn(INVOKESPECIAL,
+              "org/pitest/quickbuilder/internal/StoredValueBuilder", "<init>",
+              "(Ljava/lang/Object;)V", false);
+        } else {
+          mv.visitVarInsn(ALOAD, 1);
+        }
+      } else {
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitFieldInsn(GETFIELD, this.builderName, each.name(),
+            "Lorg/pitest/quickbuilder/Builder;");
+      }
+    }
+
+    mv.visitMethodInsn(INVOKESPECIAL, this.builderName, "<init>",
+        initDescriptor(), false);
     mv.visitInsn(ARETURN);
 
     mv.visitMaxs(1, 1);
     mv.visitEnd();
 
   }
+
+  // mv.visitTypeInsn(NEW,
+  // "com/example/beans/primitives/PrimitiveBeanBuilderImpl");
+  // mv.visitInsn(DUP);
+  // mv.visitVarInsn(ALOAD, 0);
+  // mv.visitFieldInsn(GETFIELD,
+  // "com/example/beans/primitives/PrimitiveBeanBuilderImpl", "g",
+  // "Lorg/pitest/quickbuilder/Generator;");
+  // mv.visitVarInsn(ALOAD, 0);
+  // mv.visitFieldInsn(GETFIELD,
+  // "com/example/beans/primitives/PrimitiveBeanBuilderImpl", "i",
+  // "Lorg/pitest/quickbuilder/Builder;");
+  // mv.visitVarInsn(ALOAD, 0);
+  // mv.visitFieldInsn(GETFIELD,
+  // "com/example/beans/primitives/PrimitiveBeanBuilderImpl", "b",
+  // "Lorg/pitest/quickbuilder/Builder;");
+  // mv.visitTypeInsn(NEW,
+  // "org/pitest/quickbuilder/internal/StoredValueBuilder");
+  // mv.visitInsn(DUP);
+  // mv.visitVarInsn(LLOAD, 1);
+  // mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf",
+  // "(J)Ljava/lang/Long;", false);
+  // mv.visitMethodInsn(INVOKESPECIAL,
+  // "org/pitest/quickbuilder/internal/StoredValueBuilder", "<init>",
+  // "(Ljava/lang/Object;)V", false);
+  // mv.visitMethodInsn(INVOKESPECIAL,
+  // "com/example/beans/primitives/PrimitiveBeanBuilderImpl", "<init>",
+  // "(Lorg/pitest/quickbuilder/Generator;Lorg/pitest/quickbuilder/Builder;Lorg/pitest/quickbuilder/Builder;Lorg/pitest/quickbuilder/Builder;)V",
+  // false);
+  // mv.visitInsn(ARETURN);
 
   private void createBuildMethod(final ClassWriter cw, final List<Property> ps) {
     MethodVisitor mv;
@@ -349,7 +417,7 @@ class BuilderBuilder {
         mv.visitVarInsn(ALOAD, 0);
         mv.visitFieldInsn(GETFIELD, this.builderName, p.name(),
             "Lorg/pitest/quickbuilder/Builder;");
-        Label l = new Label();
+        final Label l = new Label();
         mv.visitJumpInsn(IFNULL, l);
 
         mv.visitVarInsn(ALOAD, 1);
