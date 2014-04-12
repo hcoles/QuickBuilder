@@ -70,14 +70,13 @@ public class QBTest {
     final FruitBuilder builder = QB.builder(FruitBuilder.class);
     assertThat(builder.withName("foo")).isNotSameAs(builder);
   }
-  
-  
+
   @Test
   public void shouldImplementButMethodThatReturnsCopyOfTheBuilder() {
     final FruitBuilder builder = QB.builder(FruitBuilder.class);
     assertThat(builder.but()).isNotSameAs(builder);
   }
-  
+
   @Test
   public void shouldSupportAnyLowerCasePrefixForBuilderMethods() {
     final FruitBuilder builder = QB.builder(FruitBuilder.class);
@@ -200,9 +199,9 @@ public class QBTest {
     ChildBean bean = builder.withFoo("foo").withBar("bar").build();
     assertThat(bean.getBar()).isEqualTo("bar");
     assertThat(bean.getFoo()).isEqualTo("modifiedbychild_foo");
-    
+
   }
-  
+
   @Test
   public void shouldSetStateOnBeansForGenericListProperty() {
     final GenericPropertiesBeanBuilder builder = QB
@@ -234,20 +233,22 @@ public class QBTest {
         intGenerator());
     assertThat(builder.withI(42).build().i()).isEqualTo(42);
   }
-  
+
   @Test
   public void shouldConstructImmutableMixedValueTypes() {
-    final MixedValueBuilder builder = QB.builder(MixedValueBuilder.class, new MixedValueGenerator());
-    double[] ds = new double[]{1.0d, 2.2d};
+    final MixedValueBuilder builder = QB.builder(MixedValueBuilder.class,
+        new MixedValueGenerator());
+    double[] ds = new double[] { 1.0d, 2.2d };
     float f = 1.3f;
-    
-    MixedValue actual = builder.withDs(ds).withF(f).withS("S").withSs("SS").build();
+
+    MixedValue actual = builder.withDs(ds).withF(f).withS("S").withSs("SS")
+        .withLs(null).build();
     assertThat(actual.getDs()).isSameAs(ds);
     assertThat(actual.getF()).isEqualTo(f);
     assertThat(actual.getS()).isEqualTo("S");
     assertThat(actual.getSs()).isEqualTo("SS");
   }
-  
+
   private Generator<IntegerValue, IntegerValueBuilder> intGenerator() {
     return new Generator<IntegerValue, IntegerValueBuilder>() {
       @Override
@@ -256,22 +257,23 @@ public class QBTest {
       }
     };
   }
-  
+
   @Test(expected = QuickBuilderError.class)
   public void shouldErrorWhenNoSetterForDeclaredPropery() {
-     QB.builder(BuilderDeclaringNonExistingProperty.class); 
+    QB.builder(BuilderDeclaringNonExistingProperty.class);
   }
+
   @Test
   public void shouldNotErrorWhenNoSetterForDeclaredProperyButUnderscoreMethodExists() {
     try {
-     QB.builder(PropertyOverridenByUnderscore.class); 
-     // pass
+      QB.builder(PropertyOverridenByUnderscore.class);
+      // pass
     } catch (Exception ex) {
       fail(ex.getMessage());
     }
 
   }
-  
+
   @Test
   public void shouldAcceptBuilderInPlaceOfPropertyType() {
     CompositeBeanBuilder builder = QB.builder(CompositeBeanBuilder.class);
@@ -279,41 +281,48 @@ public class QBTest {
     CompositeBean actual = builder.withFruit(fb).build();
     assertThat(actual.getFruit().getName()).isEqualTo("foo");
   }
-  
+
   @Test
   public void shouldAllowPropertyToBeOverriddenByBuilderAndType() {
     CompositeBeanBuilder builder = QB.builder(CompositeBeanBuilder.class);
     FruitBuilder fb = QB.builder(FruitBuilder.class).withName("foo");
-    CompositeBean actual = builder.withFruit(fb).withFruit(new FruitBean()).build();
+    CompositeBean actual = builder.withFruit(fb).withFruit(new FruitBean())
+        .build();
     // last call should take precedence
-    assertThat(actual.getFruit().getName()).isNull(); 
+    assertThat(actual.getFruit().getName()).isNull();
   }
-  
-  @Test(expected=QuickBuilderError.class)
+
+  @Test(expected = QuickBuilderError.class)
   public void willAcceptBaseBuilderInterfaceInPlaceOfBuiltType() {
     QB.builder(BuilderDeclaringBaseBuilderProperty.class);
   }
-  
-  @Test(expected=QuickBuilderError.class)
+
+  @Test(expected = QuickBuilderError.class)
   public void shouldThrowErrorWhenUnderScoreMethodHasParameter() {
     QB.builder(BuilderWithParameterisedUnderscoreMethod.class);
   }
-  
-  @Test(expected=QuickBuilderError.class)
+
+  @Test(expected = QuickBuilderError.class)
   public void shouldThrowErrorWhenTypeOfUnderscoreMethodDoesNotMatchProperty() {
     QB.builder(BuilderWithTypeMismatchInUnderscoreMethod.class);
   }
 
-  @Test(expected=QuickBuilderError.class)
+  @Test(expected = QuickBuilderError.class)
   public void shouldThrowErrorWhenWithMethodDoesNotReturnBuilder() {
     QB.builder(BuilderWithPropertyReturningWrongType.class);
   }
-  
-  @Test(expected=QuickBuilderError.class)
+
+  @Test(expected = QuickBuilderError.class)
   public void shouldThrowErrorWhenWithMethodHasWrongNumberOfParameters() {
     QB.builder(BuilderWithPropertyWithTooManyParameters.class);
   }
-  
 
+  @Test(expected = QuickBuilderError.class)
+  public void shouldThrowErrorWhenPropertyAccessedWithoutAValueBeingSet() {
+    final MixedValueBuilder builder = QB.builder(MixedValueBuilder.class,
+        new MixedValueGenerator());
+    builder.withF(1.0f).build();
+    // fail
+  }
 
 }

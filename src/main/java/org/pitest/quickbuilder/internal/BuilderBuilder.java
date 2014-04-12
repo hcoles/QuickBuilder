@@ -139,6 +139,21 @@ class BuilderBuilder {
     mv.visitVarInsn(ALOAD, 0);
     mv.visitFieldInsn(GETFIELD, this.builderName, each.name(),
         "Lorg/pitest/quickbuilder/Builder;");
+    
+
+    Label l = new Label();
+    mv.visitJumpInsn(IFNONNULL, l);
+    mv.visitTypeInsn(NEW, "org/pitest/quickbuilder/QuickBuilderError");
+    mv.visitInsn(DUP);
+    mv.visitLdcInsn("_" + each.name() + "() called, but not value has been set for property " + each.name());
+    mv.visitMethodInsn(INVOKESPECIAL, "org/pitest/quickbuilder/QuickBuilderError", "<init>", "(Ljava/lang/String;)V", false);
+    mv.visitInsn(ATHROW);
+    
+    mv.visitLabel(l);
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitFieldInsn(GETFIELD, this.builderName, each.name(),
+        "Lorg/pitest/quickbuilder/Builder;");
+    
     mv.visitMethodInsn(INVOKEINTERFACE, "org/pitest/quickbuilder/Builder",
         "build", "()Ljava/lang/Object;", true);
 

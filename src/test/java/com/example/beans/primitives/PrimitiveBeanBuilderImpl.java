@@ -1,6 +1,7 @@
 package com.example.beans.primitives;
 
 import org.pitest.quickbuilder.Builder;
+import org.pitest.quickbuilder.QuickBuilderError;
 import org.pitest.quickbuilder.internal.StoredValueBuilder;
 
 public class PrimitiveBeanBuilderImpl implements PrimitiveBeanBuilder {
@@ -38,6 +39,13 @@ public class PrimitiveBeanBuilderImpl implements PrimitiveBeanBuilder {
   public PrimitiveBeanBuilder withI(int i) {
     this.i = new StoredValueBuilder<Integer>(i);
     return this;
+  }
+  
+  public int _I() {
+    if ( this.i == null ) {
+      throw new QuickBuilderError("Trying to access property but no value has been set"  );
+    }
+    return i.build();
   }
   
   public byte[] _B() {
