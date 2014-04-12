@@ -2,8 +2,13 @@ package org.pitest.quickbuilder;
 
 import org.pitest.quickbuilder.internal.TypeScanner;
 
+/**
+ * Entry point for QuickBuilder - creates builder implementations when supplied
+ * with an interface extending {@link Builder}.
+ *
+ */
 public abstract class QB {
-
+  
   /**
    * Create a Builder implementation for the supplied interface.
    * 
@@ -15,6 +20,8 @@ public abstract class QB {
    * will be cheap as the class will be loaded into the jvm like any other. 
    * 
    * @param builder Interface to implement
+   * @param <T> Type of class to be built
+   * @param <B> Type of builder interface
    * @return A builder instance
    */
   @SuppressWarnings("unchecked")
@@ -32,6 +39,8 @@ public abstract class QB {
    * 
    * @param builder Interface to implement
    * @param seed Function object that constructs instance of built type
+   * @param <T> Type of class to be built
+   * @param <B> Type of builder interface
    * @return A builder instance
    */
   @SuppressWarnings("unchecked")
