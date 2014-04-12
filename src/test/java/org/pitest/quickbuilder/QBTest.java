@@ -10,6 +10,8 @@ import org.junit.Test;
 
 import com.example.beans.ArrayBean;
 import com.example.beans.ArrayBeanBuilder;
+import com.example.beans.ByteArrayBean;
+import com.example.beans.ByteArrayBeanBuilder;
 import com.example.beans.ChildBean;
 import com.example.beans.ChildBeanBuilder;
 import com.example.beans.CompositeBean;
@@ -18,16 +20,31 @@ import com.example.beans.FruitBean;
 import com.example.beans.FruitBuilder;
 import com.example.beans.GenericPropertiesBean;
 import com.example.beans.GenericPropertiesBeanBuilder;
-import com.example.beans.PrimitiveBean;
-import com.example.beans.PrimitiveBeanBuilder;
 import com.example.beans.PropertyOverridenByUnderscore;
 import com.example.beans.StatelessBeanBuilder;
+import com.example.beans.StringBeanBuilder;
 import com.example.beans.misuse.BuilderDeclaringBaseBuilderProperty;
 import com.example.beans.misuse.BuilderDeclaringNonExistingProperty;
 import com.example.beans.misuse.BuilderWithParameterisedUnderscoreMethod;
 import com.example.beans.misuse.BuilderWithPropertyReturningWrongType;
 import com.example.beans.misuse.BuilderWithPropertyWithTooManyParameters;
 import com.example.beans.misuse.BuilderWithTypeMismatchInUnderscoreMethod;
+import com.example.beans.primitives.BooleanBean;
+import com.example.beans.primitives.BooleanBeanBuilder;
+import com.example.beans.primitives.ByteBean;
+import com.example.beans.primitives.ByteBeanBuilder;
+import com.example.beans.primitives.CharBean;
+import com.example.beans.primitives.CharBeanBuilder;
+import com.example.beans.primitives.DoubleBean;
+import com.example.beans.primitives.DoubleBeanBuilder;
+import com.example.beans.primitives.FloatBean;
+import com.example.beans.primitives.FloatBeanBuilder;
+import com.example.beans.primitives.IntBean;
+import com.example.beans.primitives.IntBeanBuilder;
+import com.example.beans.primitives.LongBean;
+import com.example.beans.primitives.LongBeanBuilder;
+import com.example.beans.primitives.ShortBean;
+import com.example.beans.primitives.ShortBeanBuilder;
 import com.example.immutable.IntegerValue;
 import com.example.immutable.IntegerValueBuilder;
 import com.example.immutable.MixedValue;
@@ -69,7 +86,7 @@ public class QBTest {
 
   @Test
   public void shouldSetStateOnBeansForStringProperty() {
-    final FruitBuilder builder = QB.builder(FruitBuilder.class);
+    final StringBeanBuilder builder = QB.builder(StringBeanBuilder.class);
     assertThat(builder.withName("foo").build().getName()).isEqualTo("foo");
   }
 
@@ -83,65 +100,65 @@ public class QBTest {
 
   @Test
   public void shouldSetStateOnBeansForIntProperty() {
-    final FruitBuilder builder = QB.builder(FruitBuilder.class);
-    final FruitBean fruit = builder.withRipeness(42).build();
-    assertThat(fruit.getRipeness()).isEqualTo(42);
+    final IntBeanBuilder builder = QB.builder(IntBeanBuilder.class);
+    final IntBean b = builder.withI(42).build();
+    assertThat(b.getI()).isEqualTo(42);
   }
 
   @Test
   public void shouldSetStateOnBeansForLongProperty() {
-    final PrimitiveBeanBuilder builder = QB.builder(PrimitiveBeanBuilder.class);
-    final PrimitiveBean b = builder.withL(42l).build();
+    final LongBeanBuilder builder = QB.builder(LongBeanBuilder.class);
+    final LongBean b = builder.withL(42l).build();
     assertThat(b.getL()).isEqualTo(42);
   }
 
   @Test
   public void shouldSetStateOnBeansForFloatProperty() {
-    final PrimitiveBeanBuilder builder = QB.builder(PrimitiveBeanBuilder.class);
-    final PrimitiveBean b = builder.withF(42f).build();
+    final FloatBeanBuilder builder = QB.builder(FloatBeanBuilder.class);
+    final FloatBean b = builder.withF(42f).build();
     assertThat(b.getF()).isEqualTo(42f);
   }
 
   @Test
   public void shouldSetStateOnBeansForDoubleProperty() {
-    final PrimitiveBeanBuilder builder = QB.builder(PrimitiveBeanBuilder.class);
-    final PrimitiveBean b = builder.withD(42d).build();
+    final DoubleBeanBuilder builder = QB.builder(DoubleBeanBuilder.class);
+    final DoubleBean b = builder.withD(42d).build();
     assertThat(b.getD()).isEqualTo(42d);
   }
 
   @Test
   public void shouldSetStateOnBeansForBooleanProperty() {
-    final PrimitiveBeanBuilder builder = QB.builder(PrimitiveBeanBuilder.class);
-    final PrimitiveBean b = builder.withB(true).build();
+    final BooleanBeanBuilder builder = QB.builder(BooleanBeanBuilder.class);
+    final BooleanBean b = builder.withB(true).build();
     assertThat(b.isB()).isEqualTo(true);
   }
 
   @Test
   public void shouldSetStateOnBeansForShortProperty() {
-    final PrimitiveBeanBuilder builder = QB.builder(PrimitiveBeanBuilder.class);
-    final PrimitiveBean b = builder.withS((short) 3).build();
+    final ShortBeanBuilder builder = QB.builder(ShortBeanBuilder.class);
+    final ShortBean b = builder.withS((short) 3).build();
     assertThat(b.getS()).isEqualTo((short) 3);
   }
 
   @Test
   public void shouldSetStateOnBeansForCharProperty() {
-    final PrimitiveBeanBuilder builder = QB.builder(PrimitiveBeanBuilder.class);
-    final PrimitiveBean b = builder.withC('a').build();
+    final CharBeanBuilder builder = QB.builder(CharBeanBuilder.class);
+    final CharBean b = builder.withC('a').build();
     assertThat(b.getC()).isEqualTo('a');
   }
 
   @Test
   public void shouldSetStateOnBeansForByteProperty() {
-    final PrimitiveBeanBuilder builder = QB.builder(PrimitiveBeanBuilder.class);
-    final PrimitiveBean b = builder.withBy((byte) 1).build();
+    final ByteBeanBuilder builder = QB.builder(ByteBeanBuilder.class);
+    final ByteBean b = builder.withBy((byte) 1).build();
     assertThat(b.getBy()).isEqualTo((byte) 1);
   }
 
   @Test
   public void shouldSetStateOnBeansForByteArrayProperty() {
-    final ArrayBeanBuilder builder = QB.builder(ArrayBeanBuilder.class);
+    final ByteArrayBeanBuilder builder = QB.builder(ByteArrayBeanBuilder.class);
     final byte[] bs = new byte[] {};
-    final ArrayBean b = builder.withBytes(bs).build();
+    final ByteArrayBean b = builder.withBytes(bs).build();
     assertThat(b.getBytes()).isSameAs(bs);
   }
 
@@ -296,5 +313,7 @@ public class QBTest {
   public void shouldThrowErrorWhenWithMethodHasWrongNumberOfParameters() {
     QB.builder(BuilderWithPropertyWithTooManyParameters.class);
   }
+  
+
 
 }

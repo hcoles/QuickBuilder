@@ -1,4 +1,4 @@
-package com.example.beans;
+package com.example.beans.primitives;
 
 import org.pitest.quickbuilder.Builder;
 

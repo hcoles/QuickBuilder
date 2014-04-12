@@ -68,6 +68,10 @@ class Property {
   public void disableSetter() {
     this.setter = null;
   }
+  
+  public int getSort() {
+    return this.type.getSort();
+  }
 
   @Override
   public int hashCode() {
