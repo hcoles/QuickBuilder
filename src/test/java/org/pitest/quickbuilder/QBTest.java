@@ -54,6 +54,13 @@ public class QBTest {
     assertThat(builder.withName("foo")).isNotSameAs(builder);
   }
   
+  
+  @Test
+  public void shouldImplementButMethodThatReturnsCopyOfTheBuilder() {
+    final FruitBuilder builder = QB.builder(FruitBuilder.class);
+    assertThat(builder.but()).isNotSameAs(builder);
+  }
+  
   @Test
   public void shouldSupportAnyLowerCasePrefixForBuilderMethods() {
     final FruitBuilder builder = QB.builder(FruitBuilder.class);
@@ -289,4 +296,5 @@ public class QBTest {
   public void shouldThrowErrorWhenWithMethodHasWrongNumberOfParameters() {
     QB.builder(BuilderWithPropertyWithTooManyParameters.class);
   }
+
 }

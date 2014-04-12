@@ -32,8 +32,8 @@ import org.objectweb.asm.Opcodes;
 
 class BuilderBuilder {
 
-  private static final String GENERATOR_FIELD = "___generator";
-  private static final String   BUILDER_INTERFACE   = "org/pitest/quickbuilder/Builder";
+  private static final String  GENERATOR_FIELD     = "___generator";
+  private static final String  BUILDER_INTERFACE   = "org/pitest/quickbuilder/Builder";
   private static final String  INTERNAL_INTERFACE  = "org/pitest/quickbuilder/internal/_InternalQuickBuilder";
   private static final String  GENERATOR_INTERFACE = "org/pitest/quickbuilder/Generator";
 
@@ -63,6 +63,8 @@ class BuilderBuilder {
 
     createInitMethod(cw);
     createCopyConstructor(cw);
+    createButMethod(cw);
+    createBridgeButMethod(cw);
 
     for (final Property each : this.ps) {
       createWithMethod(cw, each);
@@ -80,6 +82,23 @@ class BuilderBuilder {
     final byte[] bs = cw.toByteArray();
 
     return bs;
+
+  }
+
+  private void createButMethod(final ClassWriter cw) {
+    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "but", "()L"
+        + this.builderName + ";", null, null);
+
+    mv.visitCode();
+    mv.visitTypeInsn(NEW, this.builderName);
+    mv.visitInsn(DUP);
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitMethodInsn(INVOKESPECIAL, this.builderName, "<init>", "(L"
+        + this.builderName + ";)V", false);
+    mv.visitInsn(ARETURN);
+
+    mv.visitMaxs(1, 1);
+    mv.visitEnd();
 
   }
 
@@ -245,13 +264,26 @@ class BuilderBuilder {
   }
 
   private void createBridgeMethod(final ClassWriter cw) {
-    MethodVisitor mv;
-    mv = cw.visitMethod(ACC_PUBLIC + ACC_BRIDGE + ACC_SYNTHETIC, "build",
-        "()Ljava/lang/Object;", null, null);
+
+    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC + ACC_BRIDGE
+        + ACC_SYNTHETIC, "build", "()Ljava/lang/Object;", null, null);
     mv.visitCode();
     mv.visitVarInsn(ALOAD, 0);
     mv.visitMethodInsn(INVOKEVIRTUAL, this.builderName, "build", "()L"
         + this.built + ";", false);
+    mv.visitInsn(ARETURN);
+    mv.visitMaxs(1, 1);
+    mv.visitEnd();
+  }
+
+  private void createBridgeButMethod(final ClassWriter cw) {
+    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC + ACC_BRIDGE
+        + ACC_SYNTHETIC, "but", "()Lorg/pitest/quickbuilder/Builder;", null,
+        null);
+    mv.visitCode();
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitMethodInsn(INVOKEVIRTUAL, this.builderName, "but", "()L"
+        + this.builderName + ";", false);
     mv.visitInsn(ARETURN);
     mv.visitMaxs(1, 1);
     mv.visitEnd();
