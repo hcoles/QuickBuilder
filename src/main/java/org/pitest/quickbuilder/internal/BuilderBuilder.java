@@ -38,17 +38,19 @@ import org.objectweb.asm.Type;
 
 class BuilderBuilder {
 
-  private static final String STORED_VALUE_BUILDER_NAME = "org/pitest/quickbuilder/internal/StoredValueBuilder";
-  private static final String  GENERATOR_FIELD     = "___generator";
-  private static final String  BUILDER_INTERFACE   = "org/pitest/quickbuilder/Builder";
-  private static final String  INTERNAL_INTERFACE  = "org/pitest/quickbuilder/internal/_InternalQuickBuilder";
-  private static final String  GENERATOR_INTERFACE = "org/pitest/quickbuilder/Generator";
-  private static final String  GENERATOR_TYPE = "Lorg/pitest/quickbuilder/Generator;";
+  private static final TypeName STORED_VALUE_BUILDER = TypeName
+                                                         .fromString("org/pitest/quickbuilder/internal/StoredValueBuilder");
+  private static final String   GENERATOR_FIELD      = "___generator";
+  private static final TypeName BUILDER_INTERFACE    = TypeName
+                                                         .fromString("org/pitest/quickbuilder/Builder");
+  private static final String   INTERNAL_INTERFACE   = "org/pitest/quickbuilder/internal/_InternalQuickBuilder";
+  private static final String   GENERATOR_INTERFACE  = "org/pitest/quickbuilder/Generator";
+  private static final String   GENERATOR_TYPE       = "Lorg/pitest/quickbuilder/Generator;";
 
-  private final String         builderName;
-  private final String         proxiedName;
-  private final String         built;
-  private final List<Property> ps;
+  private final String          builderName;
+  private final String          proxiedName;
+  private final String          built;
+  private final List<Property>  ps;
 
   BuilderBuilder(final String builderName, final String proxiedName,
       final String built, final List<Property> ps) {
@@ -63,9 +65,10 @@ class BuilderBuilder {
     final ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 
     cw.visit(Opcodes.V1_5, ACC_PUBLIC + ACC_SUPER, this.builderName,
-        "Ljava/lang/Object;L" + BUILDER_INTERFACE + "<L" + this.built + ";>;"
-            + "L" + this.proxiedName + ";", "java/lang/Object", new String[] {
-            BUILDER_INTERFACE, this.proxiedName, INTERNAL_INTERFACE });
+        "Ljava/lang/Object;L" + BUILDER_INTERFACE.name() + "<L" + this.built
+            + ";>;" + "L" + this.proxiedName + ";", "java/lang/Object",
+        new String[] { BUILDER_INTERFACE.name(), this.proxiedName,
+            INTERNAL_INTERFACE });
 
     createFields(cw);
 
@@ -105,7 +108,8 @@ class BuilderBuilder {
     mv.visitTypeInsn(NEW, this.builderName);
     mv.visitInsn(DUP);
     mv.visitVarInsn(ALOAD, 0);
-    mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD,GENERATOR_TYPE);
+    mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD,
+        GENERATOR_TYPE);
 
     for (final Property each : this.uniqueProperties()) {
       mv.visitVarInsn(ALOAD, 0);
@@ -134,7 +138,8 @@ class BuilderBuilder {
 
     mv.visitVarInsn(ALOAD, 0);
     mv.visitVarInsn(ALOAD, 1);
-    mv.visitFieldInsn(PUTFIELD, this.builderName, GENERATOR_FIELD, GENERATOR_TYPE);
+    mv.visitFieldInsn(PUTFIELD, this.builderName, GENERATOR_FIELD,
+        GENERATOR_TYPE);
 
     int index = 2;
     for (final Property each : this.uniqueProperties()) {
@@ -148,20 +153,21 @@ class BuilderBuilder {
 
   // For non null parameters call the but method, for null parametres store null
   // in the field.
-  private int storeParameterInField(final MethodVisitor mv, int index,
+  private int storeParameterInField(final MethodVisitor mv, final int index,
       final Property each) {
     mv.visitVarInsn(ALOAD, index);
-    Label l = new Label();
+    final Label l = new Label();
     mv.visitJumpInsn(Opcodes.IFNULL, l);
-    
+
     mv.visitVarInsn(ALOAD, 0);
     mv.visitVarInsn(ALOAD, index);
-    mv.visitMethodInsn(INVOKEINTERFACE, "org/pitest/quickbuilder/Builder", "but", "()Lorg/pitest/quickbuilder/Builder;", true);
+    mv.visitMethodInsn(INVOKEINTERFACE, "org/pitest/quickbuilder/Builder",
+        "but", "()Lorg/pitest/quickbuilder/Builder;", true);
     mv.visitFieldInsn(PUTFIELD, this.builderName, each.name(),
         "Lorg/pitest/quickbuilder/Builder;");
-    Label l2 = new Label();
+    final Label l2 = new Label();
     mv.visitJumpInsn(Opcodes.GOTO, l2);
-    
+
     mv.visitLabel(l);
     mv.visitVarInsn(ALOAD, 0);
     mv.visitInsn(ACONST_NULL);
@@ -176,19 +182,20 @@ class BuilderBuilder {
     sb.append("(");
     sb.append("Lorg/pitest/quickbuilder/Generator<" + this.built + ";L"
         + this.builderName + ";>;");
-    
+
     for (final Property each : this.uniqueProperties()) {
       sb.append("Lorg/pitest/quickbuilder/Builder<" + each.declaredType()
           + ">;");
     }
-    
+
     sb.append(";)V");
     final String sig = sb.toString();
     return sig;
   }
 
   private String initDescriptor() {
-    return "(" + GENERATOR_TYPE
+    return "("
+        + GENERATOR_TYPE
         + StringUtils.repeat("Lorg/pitest/quickbuilder/Builder;", this
             .uniqueProperties().size()) + ")V";
   }
@@ -289,12 +296,13 @@ class BuilderBuilder {
 
   private void createGeneratorMethod(final ClassWriter cw) {
     final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "__internal", "("
-        + GENERATOR_TYPE + ")V", "(L" + GENERATOR_INTERFACE + "<L"
-        + this.built + ";+L" + BUILDER_INTERFACE + "<L" + this.built
-        + ";>;>;)V", null);
+        + GENERATOR_TYPE + ")V", "(L" + GENERATOR_INTERFACE + "<L" + this.built
+        + ";+L" + BUILDER_INTERFACE.name() + "<L" + this.built + ";>;>;)V",
+        null);
     mv.visitVarInsn(ALOAD, 0);
     mv.visitVarInsn(ALOAD, 1);
-    mv.visitFieldInsn(PUTFIELD, this.builderName, GENERATOR_FIELD, GENERATOR_TYPE);
+    mv.visitFieldInsn(PUTFIELD, this.builderName, GENERATOR_FIELD,
+        GENERATOR_TYPE);
     mv.visitInsn(RETURN);
     mv.visitMaxs(2, 2);
     mv.visitEnd();
@@ -302,16 +310,15 @@ class BuilderBuilder {
 
   private void createFields(final ClassWriter cw) {
     final FieldVisitor fv1 = cw.visitField(ACC_PRIVATE + ACC_FINAL,
-        GENERATOR_FIELD, GENERATOR_TYPE, "L"
-            + GENERATOR_INTERFACE + "<L" + this.built + ";L" + this.builderName
-            + ";>;", null);
+        GENERATOR_FIELD, GENERATOR_TYPE, "L" + GENERATOR_INTERFACE + "<L"
+            + this.built + ";L" + this.builderName + ";>;", null);
     fv1.visitEnd();
 
     final Set<Property> uniquePs = uniqueProperties();
     for (final Property each : uniquePs) {
       final FieldVisitor fv = cw.visitField(Opcodes.ACC_PRIVATE, each.name(),
-          "L" + BUILDER_INTERFACE + ";",
-          "L" + BUILDER_INTERFACE + "<" + each.type() + ";>;", null);
+          BUILDER_INTERFACE.type(),
+          "L" + BUILDER_INTERFACE.name() + "<" + each.type() + ";>;", null);
       fv.visitEnd();
     }
   }
@@ -328,7 +335,8 @@ class BuilderBuilder {
     mv.visitTypeInsn(NEW, this.builderName);
     mv.visitInsn(DUP);
     mv.visitVarInsn(ALOAD, 0);
-    mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD,GENERATOR_TYPE);
+    mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD,
+        GENERATOR_TYPE);
 
     for (final Property each : this.uniqueProperties()) {
       if (each.name().equals(prop.name())) {
@@ -354,15 +362,13 @@ class BuilderBuilder {
   }
 
   private void wrapInBuilderObject(final Property prop, final MethodVisitor mv) {
-    mv.visitTypeInsn(NEW,
-        STORED_VALUE_BUILDER_NAME);
+    mv.visitTypeInsn(NEW, STORED_VALUE_BUILDER.name());
     mv.visitInsn(DUP);
     mv.visitVarInsn(prop.loadIns(), 1);
 
     convertPrimitiveToWrappingObject(prop, mv);
 
-    mv.visitMethodInsn(INVOKESPECIAL,
-        STORED_VALUE_BUILDER_NAME, "<init>",
+    mv.visitMethodInsn(INVOKESPECIAL, STORED_VALUE_BUILDER.name(), "<init>",
         "(Ljava/lang/Object;)V", false);
   }
 
@@ -395,7 +401,6 @@ class BuilderBuilder {
     }
   }
 
-
   private void createBuildMethod(final ClassWriter cw, final List<Property> ps) {
     MethodVisitor mv;
     mv = cw.visitMethod(ACC_PUBLIC, "build", "()L" + this.built + ";", null,
@@ -404,14 +409,16 @@ class BuilderBuilder {
 
     // handle generator case
     mv.visitVarInsn(ALOAD, 0);
-    mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD, GENERATOR_TYPE);
+    mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD,
+        GENERATOR_TYPE);
     final Label defaultConsCall = new Label();
     mv.visitJumpInsn(IFNULL, defaultConsCall);
     mv.visitVarInsn(ALOAD, 0);
-    mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD, GENERATOR_TYPE);
+    mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD,
+        GENERATOR_TYPE);
     mv.visitVarInsn(ALOAD, 0);
-    mv.visitMethodInsn(INVOKEINTERFACE, GENERATOR_INTERFACE, "generate", "(L"
-        + BUILDER_INTERFACE + ";)Ljava/lang/Object;", true);
+    mv.visitMethodInsn(INVOKEINTERFACE, GENERATOR_INTERFACE, "generate", "("
+        + BUILDER_INTERFACE.type() + ")Ljava/lang/Object;", true);
     mv.visitTypeInsn(CHECKCAST, this.built);
     mv.visitVarInsn(ASTORE, 1);
     final Label setProps = new Label();
@@ -436,7 +443,8 @@ class BuilderBuilder {
     mv.visitEnd();
   }
 
-  private void callSetterIfPropertyHasValue(MethodVisitor mv, final Property p) {
+  private void callSetterIfPropertyHasValue(final MethodVisitor mv,
+      final Property p) {
     mv.visitVarInsn(ALOAD, 0);
     mv.visitFieldInsn(GETFIELD, this.builderName, p.name(),
         "Lorg/pitest/quickbuilder/Builder;");
@@ -448,13 +456,13 @@ class BuilderBuilder {
     mv.visitFieldInsn(GETFIELD, this.builderName, p.name(),
         "Lorg/pitest/quickbuilder/Builder;");
 
-    mv.visitMethodInsn(INVOKEINTERFACE, BUILDER_INTERFACE, "build",
+    mv.visitMethodInsn(INVOKEINTERFACE, BUILDER_INTERFACE.name(), "build",
         "()Ljava/lang/Object;", true);
 
     castPrimitives(p, mv);
 
-    mv.visitMethodInsn(INVOKEVIRTUAL, this.built, p.setter().name(), p
-        .setter().desc(), false);
+    mv.visitMethodInsn(INVOKEVIRTUAL, this.built, p.setter().name(), p.setter()
+        .desc(), false);
 
     mv.visitLabel(l);
   }
