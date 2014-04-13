@@ -38,6 +38,7 @@ import org.objectweb.asm.Type;
 
 class BuilderBuilder {
 
+  private static final String STORED_VALUE_BUILDER_NAME = "org/pitest/quickbuilder/internal/StoredValueBuilder";
   private static final String  GENERATOR_FIELD     = "___generator";
   private static final String  BUILDER_INTERFACE   = "org/pitest/quickbuilder/Builder";
   private static final String  INTERNAL_INTERFACE  = "org/pitest/quickbuilder/internal/_InternalQuickBuilder";
@@ -73,12 +74,7 @@ class BuilderBuilder {
     createButMethod(cw);
     createBridgeButMethod(cw);
 
-    for (final Property each : this.ps) {
-      createWithMethod(cw, each);
-      if (!each.isBuilder()) {
-        createAccessor(cw, each);
-      }
-    }
+    createPropertyMethods(cw);
 
     createGeneratorMethod(cw);
     createBuildMethod(cw, this.ps);
@@ -90,6 +86,15 @@ class BuilderBuilder {
 
     return bs;
 
+  }
+
+  private void createPropertyMethods(final ClassWriter cw) {
+    for (final Property each : this.ps) {
+      createWithMethod(cw, each);
+      if (!each.isBuilder()) {
+        createAccessor(cw, each);
+      }
+    }
   }
 
   private void createButMethod(final ClassWriter cw) {
@@ -119,17 +124,7 @@ class BuilderBuilder {
 
   private void createCopyConstructor(final ClassWriter cw) {
 
-    final StringBuilder sb = new StringBuilder();
-    sb.append("(");
-    sb.append("Lorg/pitest/quickbuilder/Generator<" + this.built + ";L"
-        + this.builderName + ";>;");
-    for (final Property each : this.uniqueProperties()) {
-      sb.append("Lorg/pitest/quickbuilder/Builder<" + each.declaredType()
-          + ">;");
-    }
-    sb.append(";)V");
-    final String sig = sb.toString();
-
+    final String sig = copyConstructorSignature();
     final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "<init>",
         initDescriptor(), sig, null);
 
@@ -143,32 +138,53 @@ class BuilderBuilder {
 
     int index = 2;
     for (final Property each : this.uniqueProperties()) {
-      
-      mv.visitVarInsn(ALOAD, index);
-      Label l = new Label();
-      mv.visitJumpInsn(Opcodes.IFNULL, l);
-      
-      mv.visitVarInsn(ALOAD, 0);
-      mv.visitVarInsn(ALOAD, index);
-      mv.visitMethodInsn(INVOKEINTERFACE, "org/pitest/quickbuilder/Builder", "but", "()Lorg/pitest/quickbuilder/Builder;", true);
-      mv.visitFieldInsn(PUTFIELD, this.builderName, each.name(),
-          "Lorg/pitest/quickbuilder/Builder;");
-      Label l2 = new Label();
-      mv.visitJumpInsn(Opcodes.GOTO, l2);
-      
-      mv.visitLabel(l);
-      mv.visitVarInsn(ALOAD, 0);
-      mv.visitInsn(ACONST_NULL);
-      mv.visitFieldInsn(PUTFIELD, this.builderName, each.name(),
-          "Lorg/pitest/quickbuilder/Builder;");
-      mv.visitLabel(l2);
-
-      index = index + 1;
+      index = storeParameterInField(mv, index, each);
     }
 
     mv.visitInsn(RETURN);
     mv.visitMaxs(1, 1);
     mv.visitEnd();
+  }
+
+  // For non null parameters call the but method, for null parametres store null
+  // in the field.
+  private int storeParameterInField(final MethodVisitor mv, int index,
+      final Property each) {
+    mv.visitVarInsn(ALOAD, index);
+    Label l = new Label();
+    mv.visitJumpInsn(Opcodes.IFNULL, l);
+    
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitVarInsn(ALOAD, index);
+    mv.visitMethodInsn(INVOKEINTERFACE, "org/pitest/quickbuilder/Builder", "but", "()Lorg/pitest/quickbuilder/Builder;", true);
+    mv.visitFieldInsn(PUTFIELD, this.builderName, each.name(),
+        "Lorg/pitest/quickbuilder/Builder;");
+    Label l2 = new Label();
+    mv.visitJumpInsn(Opcodes.GOTO, l2);
+    
+    mv.visitLabel(l);
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitInsn(ACONST_NULL);
+    mv.visitFieldInsn(PUTFIELD, this.builderName, each.name(),
+        "Lorg/pitest/quickbuilder/Builder;");
+    mv.visitLabel(l2);
+    return index + 1;
+  }
+
+  private String copyConstructorSignature() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append("(");
+    sb.append("Lorg/pitest/quickbuilder/Generator<" + this.built + ";L"
+        + this.builderName + ";>;");
+    
+    for (final Property each : this.uniqueProperties()) {
+      sb.append("Lorg/pitest/quickbuilder/Builder<" + each.declaredType()
+          + ">;");
+    }
+    
+    sb.append(";)V");
+    final String sig = sb.toString();
+    return sig;
   }
 
   private String initDescriptor() {
@@ -246,9 +262,7 @@ class BuilderBuilder {
       mv.visitTypeInsn(CHECKCAST, "java/lang/Short");
       mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Short", "shortValue", "()S",
           false);
-    }
-
-    else {
+    } else {
       mv.visitTypeInsn(CHECKCAST, each.typeName());
     }
   }
@@ -320,38 +334,14 @@ class BuilderBuilder {
       if (each.name().equals(prop.name())) {
         if (!prop.isBuilder()) {
           mv.visitTypeInsn(NEW,
-              "org/pitest/quickbuilder/internal/StoredValueBuilder");
+              STORED_VALUE_BUILDER_NAME);
           mv.visitInsn(DUP);
           mv.visitVarInsn(prop.loadIns(), 1);
 
-          if (prop.getSort() == Type.INT) {
-            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf",
-                "(I)Ljava/lang/Integer;", false);
-          } else if (prop.getSort() == Type.BOOLEAN) {
-            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "valueOf",
-                "(Z)Ljava/lang/Boolean;", false);
-          } else if (prop.getSort() == Type.BYTE) {
-            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Byte", "valueOf",
-                "(B)Ljava/lang/Byte;", false);
-          } else if (prop.getSort() == Type.SHORT) {
-            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Short", "valueOf",
-                "(S)Ljava/lang/Short;", false);
-          } else if (prop.getSort() == Type.DOUBLE) {
-            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", "valueOf",
-                "(D)Ljava/lang/Double;", false);
-          } else if (prop.getSort() == Type.FLOAT) {
-            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", "valueOf",
-                "(F)Ljava/lang/Float;", false);
-          } else if (prop.getSort() == Type.LONG) {
-            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf",
-                "(J)Ljava/lang/Long;", false);
-          } else if (prop.getSort() == Type.CHAR) {
-            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Character", "valueOf",
-                "(C)Ljava/lang/Character;", false);
-          }
+          convertPrimitiveToWrappingObject(prop, mv);
 
           mv.visitMethodInsn(INVOKESPECIAL,
-              "org/pitest/quickbuilder/internal/StoredValueBuilder", "<init>",
+              STORED_VALUE_BUILDER_NAME, "<init>",
               "(Ljava/lang/Object;)V", false);
         } else {
           mv.visitVarInsn(ALOAD, 1);
@@ -370,6 +360,35 @@ class BuilderBuilder {
     mv.visitMaxs(1, 1);
     mv.visitEnd();
 
+  }
+
+  private void convertPrimitiveToWrappingObject(final Property prop,
+      final MethodVisitor mv) {
+    if (prop.getSort() == Type.INT) {
+      mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf",
+          "(I)Ljava/lang/Integer;", false);
+    } else if (prop.getSort() == Type.BOOLEAN) {
+      mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "valueOf",
+          "(Z)Ljava/lang/Boolean;", false);
+    } else if (prop.getSort() == Type.BYTE) {
+      mv.visitMethodInsn(INVOKESTATIC, "java/lang/Byte", "valueOf",
+          "(B)Ljava/lang/Byte;", false);
+    } else if (prop.getSort() == Type.SHORT) {
+      mv.visitMethodInsn(INVOKESTATIC, "java/lang/Short", "valueOf",
+          "(S)Ljava/lang/Short;", false);
+    } else if (prop.getSort() == Type.DOUBLE) {
+      mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", "valueOf",
+          "(D)Ljava/lang/Double;", false);
+    } else if (prop.getSort() == Type.FLOAT) {
+      mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", "valueOf",
+          "(F)Ljava/lang/Float;", false);
+    } else if (prop.getSort() == Type.LONG) {
+      mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf",
+          "(J)Ljava/lang/Long;", false);
+    } else if (prop.getSort() == Type.CHAR) {
+      mv.visitMethodInsn(INVOKESTATIC, "java/lang/Character", "valueOf",
+          "(C)Ljava/lang/Character;", false);
+    }
   }
 
 
@@ -414,8 +433,6 @@ class BuilderBuilder {
         mv.visitVarInsn(ALOAD, 0);
         mv.visitFieldInsn(GETFIELD, this.builderName, p.name(),
             "Lorg/pitest/quickbuilder/Builder;");
-
-        ;
 
         mv.visitMethodInsn(INVOKEINTERFACE, BUILDER_INTERFACE, "build",
             "()Ljava/lang/Object;", true);
