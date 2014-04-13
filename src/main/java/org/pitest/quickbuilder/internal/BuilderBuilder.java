@@ -72,13 +72,13 @@ class BuilderBuilder {
     createInitMethod(cw);
     createCopyConstructor(cw);
     createButMethod(cw);
-    createBridgeButMethod(cw);
+    createBridgeForButMethod(cw);
 
     createPropertyMethods(cw);
 
     createGeneratorMethod(cw);
     createBuildMethod(cw, this.ps);
-    createBridgeMethod(cw);
+    createBridgeForBuildMethod(cw);
 
     cw.visitEnd();
 
@@ -333,16 +333,7 @@ class BuilderBuilder {
     for (final Property each : this.uniqueProperties()) {
       if (each.name().equals(prop.name())) {
         if (!prop.isBuilder()) {
-          mv.visitTypeInsn(NEW,
-              STORED_VALUE_BUILDER_NAME);
-          mv.visitInsn(DUP);
-          mv.visitVarInsn(prop.loadIns(), 1);
-
-          convertPrimitiveToWrappingObject(prop, mv);
-
-          mv.visitMethodInsn(INVOKESPECIAL,
-              STORED_VALUE_BUILDER_NAME, "<init>",
-              "(Ljava/lang/Object;)V", false);
+          wrapInBuilderObject(prop, mv);
         } else {
           mv.visitVarInsn(ALOAD, 1);
         }
@@ -360,6 +351,19 @@ class BuilderBuilder {
     mv.visitMaxs(1, 1);
     mv.visitEnd();
 
+  }
+
+  private void wrapInBuilderObject(final Property prop, final MethodVisitor mv) {
+    mv.visitTypeInsn(NEW,
+        STORED_VALUE_BUILDER_NAME);
+    mv.visitInsn(DUP);
+    mv.visitVarInsn(prop.loadIns(), 1);
+
+    convertPrimitiveToWrappingObject(prop, mv);
+
+    mv.visitMethodInsn(INVOKESPECIAL,
+        STORED_VALUE_BUILDER_NAME, "<init>",
+        "(Ljava/lang/Object;)V", false);
   }
 
   private void convertPrimitiveToWrappingObject(final Property prop,
@@ -422,28 +426,7 @@ class BuilderBuilder {
     mv.visitLabel(setProps);
     for (final Property p : ps) {
       if (p.isHasSetter()) {
-
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitFieldInsn(GETFIELD, this.builderName, p.name(),
-            "Lorg/pitest/quickbuilder/Builder;");
-        final Label l = new Label();
-        mv.visitJumpInsn(IFNULL, l);
-
-        mv.visitVarInsn(ALOAD, 1);
-        mv.visitVarInsn(ALOAD, 0);
-        mv.visitFieldInsn(GETFIELD, this.builderName, p.name(),
-            "Lorg/pitest/quickbuilder/Builder;");
-
-        mv.visitMethodInsn(INVOKEINTERFACE, BUILDER_INTERFACE, "build",
-            "()Ljava/lang/Object;", true);
-
-        castPrimitives(p, mv);
-
-        mv.visitMethodInsn(INVOKEVIRTUAL, this.built, p.setter().name(), p
-            .setter().desc(), false);
-
-        mv.visitLabel(l);
-
+        callSetterIfPropertyHasValue(mv, p);
       }
     }
 
@@ -453,7 +436,30 @@ class BuilderBuilder {
     mv.visitEnd();
   }
 
-  private void createBridgeMethod(final ClassWriter cw) {
+  private void callSetterIfPropertyHasValue(MethodVisitor mv, final Property p) {
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitFieldInsn(GETFIELD, this.builderName, p.name(),
+        "Lorg/pitest/quickbuilder/Builder;");
+    final Label l = new Label();
+    mv.visitJumpInsn(IFNULL, l);
+
+    mv.visitVarInsn(ALOAD, 1);
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitFieldInsn(GETFIELD, this.builderName, p.name(),
+        "Lorg/pitest/quickbuilder/Builder;");
+
+    mv.visitMethodInsn(INVOKEINTERFACE, BUILDER_INTERFACE, "build",
+        "()Ljava/lang/Object;", true);
+
+    castPrimitives(p, mv);
+
+    mv.visitMethodInsn(INVOKEVIRTUAL, this.built, p.setter().name(), p
+        .setter().desc(), false);
+
+    mv.visitLabel(l);
+  }
+
+  private void createBridgeForBuildMethod(final ClassWriter cw) {
 
     final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC + ACC_BRIDGE
         + ACC_SYNTHETIC, "build", "()Ljava/lang/Object;", null, null);
@@ -466,7 +472,7 @@ class BuilderBuilder {
     mv.visitEnd();
   }
 
-  private void createBridgeButMethod(final ClassWriter cw) {
+  private void createBridgeForButMethod(final ClassWriter cw) {
     final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC + ACC_BRIDGE
         + ACC_SYNTHETIC, "but", "()Lorg/pitest/quickbuilder/Builder;", null,
         null);
