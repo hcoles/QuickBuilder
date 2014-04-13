@@ -2,6 +2,7 @@ package com.example.beans;
 
 public class FruitBean {
 
+  private String id;
   private String name;
   private int    ripeness;
   private String colour;
@@ -30,4 +31,14 @@ public class FruitBean {
     this.colour = colour;
   }
 
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  
+  
 }
