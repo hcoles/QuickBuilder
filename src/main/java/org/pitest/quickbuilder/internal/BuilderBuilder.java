@@ -43,7 +43,7 @@ class BuilderBuilder {
   private static final String   GENERATOR_FIELD      = "___generator";
   private static final TypeName BUILDER_INTERFACE    = TypeName
                                                          .fromString("org/pitest/quickbuilder/Builder");
-  private static final String   INTERNAL_INTERFACE   = "org/pitest/quickbuilder/internal/_InternalQuickBuilder";
+  private static final TypeName   INTERNAL_INTERFACE   = TypeName.fromString("org/pitest/quickbuilder/internal/_InternalQuickBuilder");
   private static final String   GENERATOR_INTERFACE  = "org/pitest/quickbuilder/Generator";
   private static final String   GENERATOR_TYPE       = "Lorg/pitest/quickbuilder/Generator;";
 
@@ -68,7 +68,7 @@ class BuilderBuilder {
         "Ljava/lang/Object;L" + BUILDER_INTERFACE.name() + "<L" + this.built
             + ";>;" + "L" + this.proxiedName + ";", "java/lang/Object",
         new String[] { BUILDER_INTERFACE.name(), this.proxiedName,
-            INTERNAL_INTERFACE });
+      INTERNAL_INTERFACE.name() });
 
     createFields(cw);
 
