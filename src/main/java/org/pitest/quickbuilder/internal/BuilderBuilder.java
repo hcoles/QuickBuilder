@@ -44,8 +44,7 @@ class BuilderBuilder {
   private static final TypeName BUILDER_INTERFACE    = TypeName
                                                          .fromString("org/pitest/quickbuilder/Builder");
   private static final TypeName   INTERNAL_INTERFACE   = TypeName.fromString("org/pitest/quickbuilder/internal/_InternalQuickBuilder");
-  private static final String   GENERATOR_INTERFACE  = "org/pitest/quickbuilder/Generator";
-  private static final String   GENERATOR_TYPE       = "Lorg/pitest/quickbuilder/Generator;";
+  private static final TypeName   GENERATOR      = TypeName.fromString("org/pitest/quickbuilder/Generator");
 
   private final String          builderName;
   private final String          proxiedName;
@@ -109,7 +108,7 @@ class BuilderBuilder {
     mv.visitInsn(DUP);
     mv.visitVarInsn(ALOAD, 0);
     mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD,
-        GENERATOR_TYPE);
+        GENERATOR.type());
 
     for (final Property each : this.uniqueProperties()) {
       mv.visitVarInsn(ALOAD, 0);
@@ -139,7 +138,7 @@ class BuilderBuilder {
     mv.visitVarInsn(ALOAD, 0);
     mv.visitVarInsn(ALOAD, 1);
     mv.visitFieldInsn(PUTFIELD, this.builderName, GENERATOR_FIELD,
-        GENERATOR_TYPE);
+        GENERATOR.type());
 
     int index = 2;
     for (final Property each : this.uniqueProperties()) {
@@ -195,7 +194,7 @@ class BuilderBuilder {
 
   private String initDescriptor() {
     return "("
-        + GENERATOR_TYPE
+        + GENERATOR.type()
         + StringUtils.repeat("Lorg/pitest/quickbuilder/Builder;", this
             .uniqueProperties().size()) + ")V";
   }
@@ -296,13 +295,13 @@ class BuilderBuilder {
 
   private void createGeneratorMethod(final ClassWriter cw) {
     final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "__internal", "("
-        + GENERATOR_TYPE + ")V", "(L" + GENERATOR_INTERFACE + "<L" + this.built
+        + GENERATOR.type() + ")V", "(L" + GENERATOR.name() + "<L" + this.built
         + ";+L" + BUILDER_INTERFACE.name() + "<L" + this.built + ";>;>;)V",
         null);
     mv.visitVarInsn(ALOAD, 0);
     mv.visitVarInsn(ALOAD, 1);
     mv.visitFieldInsn(PUTFIELD, this.builderName, GENERATOR_FIELD,
-        GENERATOR_TYPE);
+        GENERATOR.type());
     mv.visitInsn(RETURN);
     mv.visitMaxs(2, 2);
     mv.visitEnd();
@@ -310,7 +309,7 @@ class BuilderBuilder {
 
   private void createFields(final ClassWriter cw) {
     final FieldVisitor fv1 = cw.visitField(ACC_PRIVATE + ACC_FINAL,
-        GENERATOR_FIELD, GENERATOR_TYPE, "L" + GENERATOR_INTERFACE + "<L"
+        GENERATOR_FIELD, GENERATOR.type(), "L" + GENERATOR.name() + "<L"
             + this.built + ";L" + this.builderName + ";>;", null);
     fv1.visitEnd();
 
@@ -336,7 +335,7 @@ class BuilderBuilder {
     mv.visitInsn(DUP);
     mv.visitVarInsn(ALOAD, 0);
     mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD,
-        GENERATOR_TYPE);
+        GENERATOR.type());
 
     for (final Property each : this.uniqueProperties()) {
       if (each.name().equals(prop.name())) {
@@ -410,14 +409,14 @@ class BuilderBuilder {
     // handle generator case
     mv.visitVarInsn(ALOAD, 0);
     mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD,
-        GENERATOR_TYPE);
+        GENERATOR.type());
     final Label defaultConsCall = new Label();
     mv.visitJumpInsn(IFNULL, defaultConsCall);
     mv.visitVarInsn(ALOAD, 0);
     mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD,
-        GENERATOR_TYPE);
+        GENERATOR.type());
     mv.visitVarInsn(ALOAD, 0);
-    mv.visitMethodInsn(INVOKEINTERFACE, GENERATOR_INTERFACE, "generate", "("
+    mv.visitMethodInsn(INVOKEINTERFACE, GENERATOR.name(), "generate", "("
         + BUILDER_INTERFACE.type() + ")Ljava/lang/Object;", true);
     mv.visitTypeInsn(CHECKCAST, this.built);
     mv.visitVarInsn(ASTORE, 1);
