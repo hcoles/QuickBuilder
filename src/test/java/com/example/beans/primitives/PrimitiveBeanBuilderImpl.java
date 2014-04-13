@@ -21,9 +21,13 @@ public class PrimitiveBeanBuilderImpl implements PrimitiveBeanBuilder {
 
   public PrimitiveBeanBuilderImpl(Generator<PrimitiveBean, PrimitiveBeanBuilder> g, Builder<Integer> i,Builder<Boolean> b, Builder<Long> l   ) {
     this.g = g;
-    this.i = i;
-    this.b = b;
-    this.l = l;
+    if ( i != null ) {
+      this.i = i.but();
+    } else {
+      this.i = null;
+    }
+    this.b = b.but();
+    this.l = l.but();
   }
   
   public PrimitiveBeanBuilderImpl() {

@@ -10,7 +10,7 @@ The builder pattern helps keep tests readable and maintainable but requires tedi
 
 You supply an interface, QuickBuilder supplies an implementation.
 
-QuickBuilder can create builders for pretty much any class - it cleanly handle immutable types and other classes not following the bean convention without resorting to dirty tricks like setting fields via reflection.
+QuickBuilder can create builders for pretty much any class - it cleanly handles immutable types and other classes not following the bean convention without resorting to dirty tricks like setting fields via reflection.
 
 ## 60 second quickstart
 

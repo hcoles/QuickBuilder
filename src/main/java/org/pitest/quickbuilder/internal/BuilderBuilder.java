@@ -146,10 +146,26 @@ class BuilderBuilder {
 
     int index = 2;
     for (final Property each : this.uniqueProperties()) {
+      
+      mv.visitVarInsn(ALOAD, index);
+      Label l = new Label();
+      mv.visitJumpInsn(Opcodes.IFNULL, l);
+      
       mv.visitVarInsn(ALOAD, 0);
       mv.visitVarInsn(ALOAD, index);
+      mv.visitMethodInsn(INVOKEINTERFACE, "org/pitest/quickbuilder/Builder", "but", "()Lorg/pitest/quickbuilder/Builder;", true);
       mv.visitFieldInsn(PUTFIELD, this.builderName, each.name(),
           "Lorg/pitest/quickbuilder/Builder;");
+      Label l2 = new Label();
+      mv.visitJumpInsn(Opcodes.GOTO, l2);
+      
+      mv.visitLabel(l);
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitInsn(ACONST_NULL);
+      mv.visitFieldInsn(PUTFIELD, this.builderName, each.name(),
+          "Lorg/pitest/quickbuilder/Builder;");
+      mv.visitLabel(l2);
+
       index = index + 1;
     }
 

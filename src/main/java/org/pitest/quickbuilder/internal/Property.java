@@ -57,10 +57,6 @@ class Property {
     return this.declaredType.getDescriptor();
   }
   
-  String declaredTypeName() {
-    return this.declaredType.getInternalName();
-  }
-  
   boolean isBuilder() {
     return !declaredType().equals(type());
   }
