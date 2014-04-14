@@ -97,8 +97,6 @@
 						<configuration>
 							<timestampedReports>false</timestampedReports>
 							<threads>2</threads>
-							<mutationThreshold>85</mutationThreshold>
-							<coverageThreshold>95</coverageThreshold>
 						</configuration>
 					</execution>
 				</executions>
