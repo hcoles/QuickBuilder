@@ -99,8 +99,9 @@ The underscore method can then be used in your seed function to route the value 
 * Automatically creates builders for beans - you just supply an interface
 * Creates builders for non-beans (e.g. immutable classes) by defining interface and small seeder function
 * Builder methods may take normal types or other builders as parameters
-* Builders return shallow copies of themselves - no need for special "but" methods
 * Supports any lowercase prefix for property methods eg "withName", "andName", "usingName"
+* Supports generation of thread safe immutable builders
+* Supports generation of rich featured mutable builders 
 
 ## Design principles
 

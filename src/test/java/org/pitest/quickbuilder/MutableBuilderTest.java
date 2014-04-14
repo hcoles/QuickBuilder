@@ -2,7 +2,10 @@ package org.pitest.quickbuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
+
 import org.junit.Test;
+import org.pitest.quickbuilder.sequence.ElementSequence;
 
 import com.example.beans.MutableByExtension;
 import com.example.beans.MutableFruitBuilder;
@@ -14,7 +17,7 @@ public class MutableBuilderTest {
     final MutableFruitBuilder builder = QB.builder(MutableFruitBuilder.class);
     assertThat(builder.but()).isNotSameAs(builder);
   }
-  
+
   @Test
   public void shouldUpdateStateOfBuilderObjectWhenWithMethodCalled() {
     final MutableFruitBuilder builder = QB.builder(MutableFruitBuilder.class);
@@ -22,16 +25,24 @@ public class MutableBuilderTest {
     assertThat(builder.withName("foo").build().getName()).isEqualTo("foo");
     assertThat(original.build().getName()).isEqualTo("foo");
   }
-  
+
   @Test
   public void shouldInheritWithMethodsFromExtendedInterface() {
     MutableByExtension builder = QB.builder(MutableByExtension.class);
     assertThat(builder.withName("foo").build().getName()).isEqualTo("foo");
   }
-  
+
   @Test
   public void shouldInheritUnderscoreMethodsFromExtendedInterface() {
     MutableByExtension builder = QB.builder(MutableByExtension.class);
     assertThat(builder.withFoo("foo")._Foo()).isEqualTo("foo");
+  }
+
+  @Test
+  public void shouldSupportSequencesOfValues() {
+    final MutableFruitBuilder builder = QB.builder(MutableFruitBuilder.class)
+        .withId(ElementSequence.from(Arrays.asList("a", "b")));
+    assertThat(builder.build().getId()).isEqualTo("a");
+    assertThat(builder.build().getId()).isEqualTo("b");
   }
 }

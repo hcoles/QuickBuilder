@@ -1,5 +1,6 @@
 package com.example.beans;
 
+import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.MutableBuilder;
 
 public interface MutableFruitBuilder extends MutableBuilder<FruitBean> {
@@ -10,6 +11,6 @@ public interface MutableFruitBuilder extends MutableBuilder<FruitBean> {
 
   MutableFruitBuilder withRipeness(int ripeness);
 
-  MutableFruitBuilder withId(String id);
+  MutableFruitBuilder withId(Builder<String> id);
   
 }
