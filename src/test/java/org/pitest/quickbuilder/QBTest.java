@@ -23,7 +23,7 @@ import com.example.beans.GenericPropertiesBeanBuilder;
 import com.example.beans.PropertyOverridenByUnderscore;
 import com.example.beans.StatelessBeanBuilder;
 import com.example.beans.StringBeanBuilder;
-import com.example.beans.misuse.BuilderDeclaringBaseBuilderProperty;
+import com.example.beans.generics.BuilderDeclaringBaseBuilderProperty;
 import com.example.beans.misuse.BuilderDeclaringNonExistingProperty;
 import com.example.beans.misuse.BuilderWithParameterisedUnderscoreMethod;
 import com.example.beans.misuse.BuilderWithPropertyReturningWrongType;
@@ -292,9 +292,12 @@ public class QBTest {
     assertThat(actual.getFruit().getName()).isNull();
   }
 
-  @Test(expected = QuickBuilderError.class)
-  public void willAcceptBaseBuilderInterfaceInPlaceOfBuiltType() {
-    QB.builder(BuilderDeclaringBaseBuilderProperty.class);
+  @Test
+  public void shouldAcceptBaseBuilderInterfaceInPlaceOfBuiltType() {
+    BuilderDeclaringBaseBuilderProperty builder = QB.builder(BuilderDeclaringBaseBuilderProperty.class);
+    FruitBuilder fb = QB.builder(FruitBuilder.class).withName("foo");
+    CompositeBean bean = builder.withMoreFruit(fb).build();
+    assertThat(bean.getMoreFruit().getName()).isEqualTo("foo");
   }
 
   @Test(expected = QuickBuilderError.class)

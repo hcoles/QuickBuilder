@@ -2,6 +2,7 @@ package org.pitest.quickbuilder.internal;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -171,12 +172,16 @@ public class TypeScanner<T, B extends Builder<T>> {
   private org.objectweb.asm.Type findPropertyType(final Method m) {
     Class<?> paramType = findDeclaredType(m);
     Class<?> t = paramType;
-    if (Builder.class.isAssignableFrom(t)) {
+    if (t.equals(Builder.class)) {
+      java.lang.reflect.ParameterizedType ty = (ParameterizedType) m
+          .getGenericParameterTypes()[0];
+      t = (Class<?>) ty.getActualTypeArguments()[0];
+    } else if (Builder.class.isAssignableFrom(t)) {
       t = (Class<?>) GenericTypeReflector.getTypeParameter(paramType,
           Builder.class.getTypeParameters()[0]);
       if (t == null) {
-        throw new QuickBuilderError(
-            "Could not determine property type. Did you declare a raw Builder<YourType> in your interface?");
+        throw new QuickBuilderError("Could not determine property type for "
+            + m.getName());
       }
     }
 
