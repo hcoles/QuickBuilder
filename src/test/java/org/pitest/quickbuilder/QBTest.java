@@ -24,6 +24,7 @@ import com.example.beans.PropertyOverridenByUnderscore;
 import com.example.beans.StatelessBeanBuilder;
 import com.example.beans.StringBeanBuilder;
 import com.example.beans.generics.BuilderDeclaringBaseBuilderProperty;
+import com.example.beans.generics.BuilderDeclaringBoundedWildcardProperty;
 import com.example.beans.misuse.BuilderDeclaringNonExistingProperty;
 import com.example.beans.misuse.BuilderWithParameterisedUnderscoreMethod;
 import com.example.beans.misuse.BuilderWithPropertyReturningWrongType;
@@ -298,6 +299,11 @@ public class QBTest {
     FruitBuilder fb = QB.builder(FruitBuilder.class).withName("foo");
     CompositeBean bean = builder.withMoreFruit(fb).build();
     assertThat(bean.getMoreFruit().getName()).isEqualTo("foo");
+  }
+  
+  @Test(expected = QuickBuilderError.class)
+  public void doesNotSupportWildCards() {
+    QB.builder(BuilderDeclaringBoundedWildcardProperty.class);
   }
 
   @Test(expected = QuickBuilderError.class)

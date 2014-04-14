@@ -3,6 +3,7 @@ package org.pitest.quickbuilder.internal;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -46,7 +47,7 @@ public class TypeScanner<T, B extends Builder<T>> {
     } catch (final QuickBuilderError e) {
       throw e;
     } catch (final Exception e) {
-      throw new QuickBuilderError(e);
+      throw new QuickBuilderError("Unexpected error", e);
     }
 
   }
@@ -175,7 +176,14 @@ public class TypeScanner<T, B extends Builder<T>> {
     if (t.equals(Builder.class)) {
       java.lang.reflect.ParameterizedType ty = (ParameterizedType) m
           .getGenericParameterTypes()[0];
-      t = (Class<?>) ty.getActualTypeArguments()[0];
+      java.lang.reflect.Type typeArgument = ty.getActualTypeArguments()[0];
+      
+      if ( typeArgument instanceof Class<?> ) {
+        t = (Class<?>) typeArgument;
+      } else {
+        throw new QuickBuilderError("Unable to determine property type for  " + m.getName() + " as wildcards not currently supported");
+      }
+      
     } else if (Builder.class.isAssignableFrom(t)) {
       t = (Class<?>) GenericTypeReflector.getTypeParameter(paramType,
           Builder.class.getTypeParameters()[0]);
