@@ -137,11 +137,12 @@ public class TypeScanner<T, B extends Builder<T>> {
       if (isPropertyMethod(m)) {
         checkWithMethod(m);
         final String prefix = extractPrefix(m.getName());
-        final String n = extractName(prefix, m);
+        final String name = extractName(prefix, m);
+        final String owner = m.getDeclaringClass().getName().replace(".", "/");
         final org.objectweb.asm.Type type = findPropertyType(m);
         final org.objectweb.asm.Type declared = Type
             .getType(findDeclaredType(m));
-        ps.add(new Property(n, prefix, type, declared, findSetter(builtType, n, type)));
+        ps.add(new Property(name, owner, prefix, type, declared, findSetter(builtType, name, type)));
       }
     }
     return ps;
@@ -210,7 +211,7 @@ public class TypeScanner<T, B extends Builder<T>> {
         final String n = extractName(USER_PROPERTY_PREFIX, m);
         final org.objectweb.asm.Type type = org.objectweb.asm.Type
             .getReturnType(m);
-        ps.add(new Property(n, USER_PROPERTY_PREFIX, type, type, findSetter(builtType, n, type)));
+        ps.add(new Property(n, null, USER_PROPERTY_PREFIX, type, type, findSetter(builtType, n, type)));
       }
     }
     return ps;

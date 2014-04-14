@@ -333,7 +333,7 @@ class BuilderBuilder {
   
   private void createMutableWithMethod(final ClassWriter cw, final Property prop) {
     final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, prop.withMethodName(),
-        "(" + prop.declaredType() + ")L" + this.proxiedName + ";", null, null);
+        "(" + prop.declaredType() + ")L" + prop.owner() + ";", null, null);
     
     mv.visitCode();
     mv.visitVarInsn(ALOAD, 0);

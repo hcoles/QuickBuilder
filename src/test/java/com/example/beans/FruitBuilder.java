@@ -11,5 +11,9 @@ public interface FruitBuilder extends Builder<FruitBean> {
   FruitBuilder withRipeness(int ripeness);
 
   FruitBuilder withId(String id);
+  
+  FruitBuilder withFoo(String id);
+  
+  String _Foo();
 
 }

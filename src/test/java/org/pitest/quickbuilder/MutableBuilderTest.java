@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
+import com.example.beans.MutableByExtension;
 import com.example.beans.MutableFruitBuilder;
 
 public class MutableBuilderTest {
@@ -22,4 +23,15 @@ public class MutableBuilderTest {
     assertThat(original.build().getName()).isEqualTo("foo");
   }
   
+  @Test
+  public void shouldInheritWithMethodsFromExtendedInterface() {
+    MutableByExtension builder = QB.builder(MutableByExtension.class);
+    assertThat(builder.withName("foo").build().getName()).isEqualTo("foo");
+  }
+  
+  @Test
+  public void shouldInheritUnderscoreMethodsFromExtendedInterface() {
+    MutableByExtension builder = QB.builder(MutableByExtension.class);
+    assertThat(builder.withFoo("foo")._Foo()).isEqualTo("foo");
+  }
 }
