@@ -50,13 +50,15 @@ class BuilderBuilder {
   private final String          proxiedName;
   private final String          built;
   private final List<Property>  ps;
-
+  private final boolean mutable;
+  
   BuilderBuilder(final String builderName, final String proxiedName,
-      final String built, final List<Property> ps) {
+      final String built, boolean isMutable, final List<Property> ps) {
     this.builderName = builderName;
     this.proxiedName = proxiedName;
     this.built = built;
     this.ps = ps;
+    this.mutable = isMutable;
   }
 
   public byte[] build() throws Exception {
@@ -73,8 +75,11 @@ class BuilderBuilder {
 
     createInitMethod(cw);
     createCopyConstructor(cw);
-    createButMethod(cw);
-    createBridgeForButMethod(cw);
+    
+    if (mutable) {
+      createButMethod(cw);
+      createBridgeForButMethod(cw);
+    }
 
     createPropertyMethods(cw);
 
@@ -150,29 +155,13 @@ class BuilderBuilder {
     mv.visitEnd();
   }
 
-  // For non null parameters call the but method, for null parametres store null
-  // in the field.
   private int storeParameterInField(final MethodVisitor mv, final int index,
       final Property each) {
-    mv.visitVarInsn(ALOAD, index);
-    final Label l = new Label();
-    mv.visitJumpInsn(Opcodes.IFNULL, l);
-
     mv.visitVarInsn(ALOAD, 0);
     mv.visitVarInsn(ALOAD, index);
-    mv.visitMethodInsn(INVOKEINTERFACE, "org/pitest/quickbuilder/Builder",
-        "but", "()Lorg/pitest/quickbuilder/Builder;", true);
+    mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/internal/BuilderImplementation", "copyBuilder", "(Lorg/pitest/quickbuilder/Builder;)Lorg/pitest/quickbuilder/Builder;", false);
     mv.visitFieldInsn(PUTFIELD, this.builderName, each.name(),
         "Lorg/pitest/quickbuilder/Builder;");
-    final Label l2 = new Label();
-    mv.visitJumpInsn(Opcodes.GOTO, l2);
-
-    mv.visitLabel(l);
-    mv.visitVarInsn(ALOAD, 0);
-    mv.visitInsn(ACONST_NULL);
-    mv.visitFieldInsn(PUTFIELD, this.builderName, each.name(),
-        "Lorg/pitest/quickbuilder/Builder;");
-    mv.visitLabel(l2);
     return index + 1;
   }
 
@@ -326,8 +315,36 @@ class BuilderBuilder {
     final Set<Property> uniquePs = new LinkedHashSet<Property>(this.ps);
     return uniquePs;
   }
-
+  
   private void createWithMethod(final ClassWriter cw, final Property prop) {
+    if (this.mutable) {
+      createMutableWithMethod(cw, prop);
+    } else {
+      createImmutableWithMethod(cw, prop);
+    }
+  }
+  
+  private void createMutableWithMethod(final ClassWriter cw, final Property prop) {
+    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, prop.withMethodName(),
+        "(" + prop.declaredType() + ")L" + this.proxiedName + ";", null, null);
+    
+    mv.visitCode();
+    mv.visitVarInsn(ALOAD, 0);
+    if (!prop.isBuilder()) {
+      wrapInBuilderObject(prop, mv);
+    } else {
+      mv.visitVarInsn(ALOAD, 1);
+    }
+    mv.visitFieldInsn(PUTFIELD, this.builderName, prop.name(), "Lorg/pitest/quickbuilder/Builder;");
+    
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitInsn(ARETURN);
+
+    mv.visitMaxs(1, 1);
+    mv.visitEnd();
+  }
+
+  private void createImmutableWithMethod(final ClassWriter cw, final Property prop) {
     final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, prop.withMethodName(),
         "(" + prop.declaredType() + ")L" + this.proxiedName + ";", null, null);
     mv.visitCode();
@@ -481,7 +498,7 @@ class BuilderBuilder {
 
   private void createBridgeForButMethod(final ClassWriter cw) {
     final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC + ACC_BRIDGE
-        + ACC_SYNTHETIC, "but", "()Lorg/pitest/quickbuilder/Builder;", null,
+        + ACC_SYNTHETIC, "but", "()Lorg/pitest/quickbuilder/MutableBuilder;", null,
         null);
     mv.visitCode();
     mv.visitVarInsn(ALOAD, 0);

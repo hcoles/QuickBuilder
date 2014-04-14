@@ -52,7 +52,7 @@ import com.example.immutable.MixedValue;
 import com.example.immutable.MixedValueBuilder;
 import com.example.immutable.MixedValueGenerator;
 
-public class QBTest {
+public class ImmutableBuilderTest {
 
   @Test
   public void shouldCreateABuilder() {
@@ -73,11 +73,13 @@ public class QBTest {
   }
 
   @Test
-  public void shouldImplementButMethodThatReturnsCopyOfTheBuilder() {
+  public void shouldNotChangeStateInBuilderWhenWithMethodCalled() {
     final FruitBuilder builder = QB.builder(FruitBuilder.class);
-    assertThat(builder.but()).isNotSameAs(builder);
+    final FruitBuilder original = builder.withName("original");
+    assertThat(builder.withName("foo").build().getName()).isEqualTo("foo");
+    assertThat(original.build().getName()).isEqualTo("original");
   }
-
+  
   @Test
   public void shouldSupportAnyLowerCasePrefixForBuilderMethods() {
     final FruitBuilder builder = QB.builder(FruitBuilder.class);

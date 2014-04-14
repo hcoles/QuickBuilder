@@ -3,7 +3,6 @@ package org.pitest.quickbuilder.internal;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -27,10 +26,12 @@ public class TypeScanner<T, B extends Builder<T>> {
 
   private final Class<B>        builder;
   private final Generator<T, B> g;
+  private final boolean isMutable;
 
-  public TypeScanner(final Class<B> builder, final Generator<T, B> g) {
+  public TypeScanner(final Class<B> builder, final Generator<T, B> g, final boolean isMutable) {
     this.builder = builder;
     this.g = g;
+    this.isMutable = isMutable;
   }
 
   @SuppressWarnings("unchecked")
@@ -74,7 +75,7 @@ public class TypeScanner<T, B extends Builder<T>> {
     checkProperties(ps, userProperties);
 
     final BuilderBuilder bb = new BuilderBuilder(builderName, proxiedName,
-        builtTypeName, ps);
+        builtTypeName, isMutable, ps);
 
     return (Class<B>) cl.createClass(bb.build(), builderName.replace('/', '.'));
   }

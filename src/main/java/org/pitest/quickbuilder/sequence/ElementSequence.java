@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.pitest.quickbuilder.Builder;
+import org.pitest.quickbuilder.MutableBuilder;
 import org.pitest.quickbuilder.internal.Iterables;
 
 /**
@@ -12,7 +12,7 @@ import org.pitest.quickbuilder.internal.Iterables;
  *
  * @param <T> Type to build
  */
-public final class ElementSequence<T> implements Builder<T> {
+public final class ElementSequence<T> implements MutableBuilder<T> {
   
   private final List<T> ts;
   private final ListIterator<T> current;

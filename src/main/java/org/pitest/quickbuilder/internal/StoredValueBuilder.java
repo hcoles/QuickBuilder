@@ -15,9 +15,4 @@ public class StoredValueBuilder<T> implements Builder<T> {
     return value;
   }
 
-  @Override
-  public Builder<T> but() {
-    return this;
-  }
-
 }
