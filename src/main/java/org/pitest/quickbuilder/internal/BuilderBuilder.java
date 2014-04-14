@@ -297,18 +297,25 @@ class BuilderBuilder {
   }
 
   private void createFields(final ClassWriter cw) {
-    final FieldVisitor fv1 = cw.visitField(ACC_PRIVATE + ACC_FINAL,
+    final FieldVisitor fv1 = cw.visitField(ACC_PRIVATE,
         GENERATOR_FIELD, GENERATOR.type(), "L" + GENERATOR.name() + "<L"
             + this.built + ";L" + this.builderName + ";>;", null);
     fv1.visitEnd();
 
     final Set<Property> uniquePs = uniqueProperties();
     for (final Property each : uniquePs) {
-      final FieldVisitor fv = cw.visitField(Opcodes.ACC_PRIVATE, each.name(),
+      final FieldVisitor fv = cw.visitField(fieldFlags(), each.name(),
           BUILDER_INTERFACE.type(),
           "L" + BUILDER_INTERFACE.name() + "<" + each.type() + ";>;", null);
       fv.visitEnd();
     }
+  }
+
+  private int fieldFlags() {
+    if (this.mutable) {
+      return ACC_PRIVATE;
+    }
+    return ACC_PRIVATE + ACC_FINAL;
   }
 
   private Set<Property> uniqueProperties() {
