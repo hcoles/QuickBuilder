@@ -57,7 +57,11 @@ public class TypeScanner<T, B extends Builder<T>> {
 
   private void checkSuppliedInterface() {
     if (!this.builder.isInterface()) {
-      throw new QuickBuilderError("Cannot create a builder from " + this.builder + " becuase it is not an interface.");
+      throw new QuickBuilderError("Cannot create a builder from " + this.builder.getName() + " becuase it is not an interface.");
+    }
+    
+    if (!Modifier.isPublic(this.builder.getModifiers())) {
+      throw new QuickBuilderError("Cannot implement the interface " + this.builder.getName() + " because it is not public"); 
     }
     
   }

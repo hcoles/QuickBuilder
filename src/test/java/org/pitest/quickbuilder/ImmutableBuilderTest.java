@@ -379,4 +379,18 @@ public class ImmutableBuilderTest {
 
   }
 
+  interface Inaccessible extends Builder<String> {
+    
+  }
+  
+  @Test
+  public void shouldThrowErrorWhenAskedToImplementInaccessibleInterface() {
+    try {
+      QB.builder(Inaccessible.class);
+    } catch (QuickBuilderError e) {
+      assertThat(e).hasMessageContaining(
+          "Cannot implement the interface " + Inaccessible.class.getName());
+    }
+  }
+  
 }
