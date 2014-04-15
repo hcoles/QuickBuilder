@@ -11,17 +11,19 @@ class Property {
   
   private final String prefix;
   private final Type declaredType;
+  private final Type   returnType;
   private final String owner;
   
   private Setter setter;
 
-  Property(final String name, String owner, String prefix, final Type type, final Type declaredType, final Setter s) {
+  Property(final String name, String owner, String prefix, final Type type, final Type declaredType, Type returnType, final Setter s) {
     this.name = name;
     this.prefix = prefix;
     this.type = type;
     this.declaredType = declaredType;
     this.setter = s;
     this.owner = owner;
+    this.returnType = returnType;
   }
 
   String name() {
@@ -74,6 +76,10 @@ class Property {
   
   public String owner() {
     return owner;
+  }
+  
+  public Type returnType() {
+    return this.returnType;
   }
 
   @Override

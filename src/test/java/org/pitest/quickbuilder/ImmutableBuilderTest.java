@@ -2,6 +2,7 @@ package org.pitest.quickbuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +47,8 @@ import com.example.beans.primitives.LongBean;
 import com.example.beans.primitives.LongBeanBuilder;
 import com.example.beans.primitives.ShortBean;
 import com.example.beans.primitives.ShortBeanBuilder;
+import com.example.example.Apple;
+import com.example.example.FruitBuilders;
 import com.example.immutable.IntegerValue;
 import com.example.immutable.IntegerValueBuilder;
 import com.example.immutable.MixedValue;
@@ -302,6 +305,14 @@ public class ImmutableBuilderTest {
     FruitBuilder fb = QB.builder(FruitBuilder.class).withName("foo");
     CompositeBean bean = builder.withMoreFruit(fb).build();
     assertThat(bean.getMoreFruit().getName()).isEqualTo("foo");
+  }
+  
+  
+  
+  @Test
+  public void shouldCreateBridgeMethodsForErasedReturnTypes() {
+    Apple a = FruitBuilders.anApple().withRipeness(2d).withLeaves(2).build();
+    assertEquals(a.numberOfLeaves(),2);
   }
 
   @Test
