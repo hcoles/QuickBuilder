@@ -3,6 +3,7 @@ package org.pitest.quickbuilder.internal;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -149,18 +150,30 @@ public class TypeScanner<T, B extends Builder<T>> {
     for (final Method m : this.builder.getMethods()) {
       if (isPropertyMethod(m)) {
         checkWithMethod(m);
+        
+        findBridgeMethodReturnTypeIfAny(m);
+        
+        
         final String prefix = extractPrefix(m.getName());
         final String name = extractName(prefix, m);
         final String owner = m.getDeclaringClass().getName().replace(".", "/");
         final org.objectweb.asm.Type type = findPropertyType(m);
         final org.objectweb.asm.Type declared = Type
             .getType(findDeclaredType(m));
-        final org.objectweb.asm.Type returnType = Type
-            .getType(m.getReturnType());
-        ps.add(new Property(name, owner, prefix, type, declared, returnType, findSetter(builtType, name, type)));
+
+        ps.add(new Property(name, owner, prefix, type, declared, findBridgeMethodReturnTypeIfAny(m), findSetter(builtType, name, type)));
       }
     }
     return ps;
+  }
+
+  private Type findBridgeMethodReturnTypeIfAny(final Method m) {
+    java.lang.reflect.Type rType = m.getGenericReturnType();
+    if ( rType instanceof TypeVariable ) {
+     return Type
+          .getType(m.getReturnType());
+    }
+    return null;
   }
 
   private String extractPrefix(String name) {

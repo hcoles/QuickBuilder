@@ -336,7 +336,7 @@ class BuilderBuilder {
       createImmutableWithMethod(cw, prop);
     }
 
-    if (!prop.returnType().getInternalName().equals(this.proxiedName)) {
+    if (prop.needsBridge() ) {
       createBridge(prop, cw);
     }
   }
@@ -344,7 +344,7 @@ class BuilderBuilder {
   private void createBridge(Property prop, ClassWriter cw) {
     MethodVisitor mv = cw.visitMethod(ACC_PUBLIC + ACC_BRIDGE + ACC_SYNTHETIC,
         prop.withMethodName(), "(" + prop.declaredType() + ")"
-            + prop.returnType().getDescriptor(), null, null);
+            + prop.bridgeReturnType().getDescriptor(), null, null);
 
     mv.visitCode();
     mv.visitVarInsn(ALOAD, 0);
