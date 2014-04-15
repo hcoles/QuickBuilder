@@ -32,8 +32,8 @@ public class FruitBuilders {
     return QB.builder(BananaBuilder.class, bananaSeed());
   }
 
-  private static Generator<Apple, AppleBuilder> appleSeed() {
-    return new Generator<Apple, AppleBuilder> () {
+  private static Generator<AppleBuilder,Apple> appleSeed() {
+    return new Generator<AppleBuilder,Apple> () {
       @Override
       public Apple generate(AppleBuilder builder) {
         return new Apple(builder._Leaves());
@@ -41,8 +41,8 @@ public class FruitBuilders {
     };
   }
   
-  private static Generator<Banana, BananaBuilder> bananaSeed() {
-    return new Generator<Banana, BananaBuilder> () {
+  private static Generator<BananaBuilder,Banana> bananaSeed() {
+    return new Generator<BananaBuilder,Banana> () {
       @Override
       public Banana generate(BananaBuilder builder) {
         return new Banana(builder._Curve());

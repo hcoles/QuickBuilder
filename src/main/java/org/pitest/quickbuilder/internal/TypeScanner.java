@@ -26,10 +26,10 @@ public class TypeScanner<T, B extends Builder<T>> {
                                                              .getClassLoader());
 
   private final Class<B>        builder;
-  private final Generator<T, B> g;
+  private final Generator<B, T> g;
   private final boolean isMutable;
 
-  public TypeScanner(final Class<B> builder, final Generator<T, B> g, final boolean isMutable) {
+  public TypeScanner(final Class<B> builder, final Generator<B,T> g, final boolean isMutable) {
     this.builder = builder;
     this.g = g;
     this.isMutable = isMutable;
@@ -113,7 +113,7 @@ public class TypeScanner<T, B extends Builder<T>> {
 
   }
 
-  private Generator<T, B> pickGenerator() throws SecurityException,
+  private Generator<B,T> pickGenerator() throws SecurityException,
       NoSuchMethodException {
     if (this.g != null) {
       return this.g;

@@ -5,7 +5,7 @@ import org.pitest.quickbuilder.QB;
 
 public class Fruits {
   
-  static class Seed implements Generator<FruitBean, FruitBuilder> {
+  static class Seed implements Generator<FruitBuilder,FruitBean> {
     @Override
     public FruitBean generate(FruitBuilder builder) {
       return new FruitBean();

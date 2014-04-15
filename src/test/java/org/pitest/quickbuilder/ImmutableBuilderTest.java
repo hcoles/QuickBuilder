@@ -255,8 +255,8 @@ public class ImmutableBuilderTest {
     assertThat(actual.getSs()).isEqualTo("SS");
   }
 
-  private Generator<IntegerValue, IntegerValueBuilder> intGenerator() {
-    return new Generator<IntegerValue, IntegerValueBuilder>() {
+  private Generator<IntegerValueBuilder,IntegerValue> intGenerator() {
+    return new Generator<IntegerValueBuilder,IntegerValue>() {
       @Override
       public IntegerValue generate(final IntegerValueBuilder builder) {
         return new IntegerValue(builder._I());

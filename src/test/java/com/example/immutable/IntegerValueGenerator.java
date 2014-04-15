@@ -3,7 +3,7 @@ package com.example.immutable;
 import org.pitest.quickbuilder.Generator;
 
 public class IntegerValueGenerator implements
-    Generator<IntegerValue, IntegerValueBuilder> {
+    Generator<IntegerValueBuilder,IntegerValue> {
 
   @Override
   public IntegerValue generate(final IntegerValueBuilder builder) {

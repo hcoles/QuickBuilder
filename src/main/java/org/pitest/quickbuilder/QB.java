@@ -45,7 +45,7 @@ public abstract class QB {
    */
   @SuppressWarnings("unchecked")
   public static <T, B extends Builder<T>> B builder(final Class<B> builder,
-      final Generator<T, B> seed) {
+      final Generator<B,T> seed) {
     final TypeScanner<T, B> ts = new TypeScanner<T, B>(builder, seed, isMutable(builder));
     return ts.builder();
   }

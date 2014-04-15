@@ -5,6 +5,6 @@ import org.pitest.quickbuilder.Generator;
 
 public interface _InternalQuickBuilder<T> {
  
-  void __internal(Generator<T, ? extends Builder<T>> g);
+  void __internal(Generator<? extends Builder<T>, T> g);
 
 }

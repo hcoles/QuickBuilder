@@ -8,7 +8,7 @@ package org.pitest.quickbuilder;
  * @param <T> The built type
  * @param <B> The builder type that produces the built type
  */
-public interface Generator<T, B extends Builder<T>> {
+public interface Generator<B extends Builder<T>, T> {
 
   T generate(B builder);
 

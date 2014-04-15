@@ -2,7 +2,7 @@ package com.example.immutable;
 
 import org.pitest.quickbuilder.Generator;
 
-public class MixedValueGenerator implements Generator<MixedValue, MixedValueBuilder> {
+public class MixedValueGenerator implements Generator<MixedValueBuilder,MixedValue> {
 
   @Override
   public MixedValue generate(MixedValueBuilder b) {
