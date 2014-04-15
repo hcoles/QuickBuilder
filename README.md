@@ -55,7 +55,7 @@ Get an instance by calling QB.builder, then use it like any other builder
     Person p = QB.builder(PersonBuilder.class).withName("Bob").withAge(42).build();
 ```
 
-For classes without a public non no-args constructor you can supply a "seed" function that creates the instance.
+For classes without a public no-args constructor you can supply a "seed" function that creates the instance.
 
 ```java
  class Seed implements Generator<Person, PersonBuilder> {

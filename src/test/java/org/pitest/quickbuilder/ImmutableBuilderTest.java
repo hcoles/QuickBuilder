@@ -79,7 +79,7 @@ public class ImmutableBuilderTest {
     assertThat(builder.withName("foo").build().getName()).isEqualTo("foo");
     assertThat(original.build().getName()).isEqualTo("original");
   }
-  
+
   @Test
   public void shouldSupportAnyLowerCasePrefixForBuilderMethods() {
     final FruitBuilder builder = QB.builder(FruitBuilder.class);
@@ -297,43 +297,86 @@ public class ImmutableBuilderTest {
 
   @Test
   public void shouldAcceptBaseBuilderInterfaceInPlaceOfBuiltType() {
-    BuilderDeclaringBaseBuilderProperty builder = QB.builder(BuilderDeclaringBaseBuilderProperty.class);
+    BuilderDeclaringBaseBuilderProperty builder = QB
+        .builder(BuilderDeclaringBaseBuilderProperty.class);
     FruitBuilder fb = QB.builder(FruitBuilder.class).withName("foo");
     CompositeBean bean = builder.withMoreFruit(fb).build();
     assertThat(bean.getMoreFruit().getName()).isEqualTo("foo");
   }
-  
-  @Test(expected = QuickBuilderError.class)
+
+  @Test
   public void doesNotSupportWildCards() {
-    QB.builder(BuilderDeclaringBoundedWildcardProperty.class);
+    try {
+      QB.builder(BuilderDeclaringBoundedWildcardProperty.class);
+    } catch (QuickBuilderError e) {
+      assertThat(e).hasMessageContaining("wildcards not currently supported");
+    }
   }
 
-  @Test(expected = QuickBuilderError.class)
+  @Test
   public void shouldThrowErrorWhenUnderScoreMethodHasParameter() {
-    QB.builder(BuilderWithParameterisedUnderscoreMethod.class);
+    try {
+      QB.builder(BuilderWithParameterisedUnderscoreMethod.class);
+    } catch (QuickBuilderError e) {
+      assertThat(e).hasMessageContaining("_Foo should not have parameters");
+    }
   }
 
-  @Test(expected = QuickBuilderError.class)
+  @Test
   public void shouldThrowErrorWhenTypeOfUnderscoreMethodDoesNotMatchProperty() {
-    QB.builder(BuilderWithTypeMismatchInUnderscoreMethod.class);
+    try {
+      QB.builder(BuilderWithTypeMismatchInUnderscoreMethod.class);
+    } catch (QuickBuilderError e) {
+      assertThat(e).hasMessageContaining("No setter found for Foo of type");
+    }
   }
 
-  @Test(expected = QuickBuilderError.class)
+  @Test
   public void shouldThrowErrorWhenWithMethodDoesNotReturnBuilder() {
-    QB.builder(BuilderWithPropertyReturningWrongType.class);
+    try {
+      QB.builder(BuilderWithPropertyReturningWrongType.class);
+    } catch (QuickBuilderError e) {
+      assertThat(e).hasMessageContaining(
+          "should declare return type as "
+              + BuilderWithPropertyReturningWrongType.class.getName());
+    }
   }
 
-  @Test(expected = QuickBuilderError.class)
+  @Test
   public void shouldThrowErrorWhenWithMethodHasWrongNumberOfParameters() {
-    QB.builder(BuilderWithPropertyWithTooManyParameters.class);
+    try {
+      QB.builder(BuilderWithPropertyWithTooManyParameters.class);
+    } catch (QuickBuilderError e) {
+      assertThat(e).hasMessageContaining("should take exactly one parameter");
+    }
   }
 
-  @Test(expected = QuickBuilderError.class)
+  @Test
   public void shouldThrowErrorWhenPropertyAccessedWithoutAValueBeingSet() {
     final MixedValueBuilder builder = QB.builder(MixedValueBuilder.class,
         new MixedValueGenerator());
-    builder.withF(1.0f).build();
+    try {
+      builder.withF(1.0f).build();
+    } catch (QuickBuilderError e) {
+      assertThat(e).hasMessageContaining("no value");
+    }
     // fail
+  }
+
+  public static abstract class InvalidClass implements Builder<String> {
+
+  }
+
+  @Test
+  public void shouldThrowErrorWhenAskedToImplementAClass() {
+    try {
+      QB.builder(InvalidClass.class);
+      fail("expected an exception");
+    } catch (QuickBuilderError e) {
+      assertThat(e).hasMessageContaining("not an interface");
+      assertThat(e).hasMessageContaining(InvalidClass.class.getName());
+    }
+
   }
 
 }

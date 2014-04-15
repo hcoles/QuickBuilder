@@ -37,6 +37,8 @@ public class TypeScanner<T, B extends Builder<T>> {
   @SuppressWarnings("unchecked")
   public B builder() {
 
+    checkSuppliedInterface();
+    
     final String proxiedName = this.builder.getName().replace(".", "/");
     final String builderName = proxiedName + "__quickbuilder__";
 
@@ -51,6 +53,13 @@ public class TypeScanner<T, B extends Builder<T>> {
       throw new QuickBuilderError("Unexpected error", e);
     }
 
+  }
+
+  private void checkSuppliedInterface() {
+    if (!this.builder.isInterface()) {
+      throw new QuickBuilderError("Cannot create a builder from " + this.builder + " becuase it is not an interface.");
+    }
+    
   }
 
   @SuppressWarnings("unchecked")
@@ -92,7 +101,7 @@ public class TypeScanner<T, B extends Builder<T>> {
                   + each.name()
                   + " of type "
                   + each.type()
-                  + ".\nCheck name or declare an underscore method and generator to handle it yourself.");
+                  + ".\nCheck name and type or declare an underscore method and generator to handle it yourself.");
         }
       }
     }

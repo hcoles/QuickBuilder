@@ -202,7 +202,7 @@ class BuilderBuilder {
     mv.visitTypeInsn(NEW, "org/pitest/quickbuilder/QuickBuilderError");
     mv.visitInsn(DUP);
     mv.visitLdcInsn("_" + each.name()
-        + "() called, but not value has been set for property " + each.name());
+        + "() called, but no value has been set for property " + each.name());
     mv.visitMethodInsn(INVOKESPECIAL,
         "org/pitest/quickbuilder/QuickBuilderError", "<init>",
         "(Ljava/lang/String;)V", false);
