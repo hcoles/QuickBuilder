@@ -43,8 +43,6 @@ class BuilderBuilder {
   private static final String   GENERATOR_FIELD      = "___generator";
   private static final TypeName BUILDER_INTERFACE    = TypeName
                                                          .fromString("org/pitest/quickbuilder/Builder");
-  private static final TypeName INTERNAL_INTERFACE   = TypeName
-                                                         .fromString("org/pitest/quickbuilder/internal/_InternalQuickBuilder");
   private static final TypeName GENERATOR            = TypeName
                                                          .fromString("org/pitest/quickbuilder/Generator");
 
@@ -70,13 +68,14 @@ class BuilderBuilder {
     cw.visit(Opcodes.V1_5, ACC_PUBLIC + ACC_SUPER, this.builderName,
         "Ljava/lang/Object;L" + BUILDER_INTERFACE.name() + "<L" + this.built
             + ";>;" + "L" + this.proxiedName + ";", "java/lang/Object",
-        new String[] { BUILDER_INTERFACE.name(), this.proxiedName,
-            INTERNAL_INTERFACE.name() });
+        new String[] { BUILDER_INTERFACE.name(), this.proxiedName });
 
     createFields(cw);
 
     createInitMethod(cw);
-    createCopyConstructor(cw);
+    if (!this.uniqueProperties().isEmpty()) {
+      createCopyConstructor(cw);
+    }
 
     if (mutable) {
       createButMethod(cw);
@@ -85,7 +84,6 @@ class BuilderBuilder {
 
     createPropertyMethods(cw);
 
-    createGeneratorMethod(cw);
     createBuildMethod(cw, this.ps);
     createBridgeForBuildMethod(cw);
 
@@ -269,41 +267,37 @@ class BuilderBuilder {
   }
 
   private void createInitMethod(final ClassWriter cw) {
-    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null,
+    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "<init>", "(" + GENERATOR.type() +")V", "(L" + GENERATOR.name() + "<L" + this.built
+        + ";+L" + BUILDER_INTERFACE.name() + "<L" + this.built + ";>;>;)V",
         null);
     mv.visitCode();
 
     mv.visitVarInsn(ALOAD, 0);
-    mv.visitInsn(ACONST_NULL);
+    mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
 
-    for (int i = 0; i != this.uniqueProperties().size(); i++) {
-      mv.visitInsn(ACONST_NULL);
-    }
-
-    mv.visitMethodInsn(INVOKESPECIAL, this.builderName, "<init>",
-        this.initDescriptor(), false);
-
-    mv.visitInsn(RETURN);
-    mv.visitMaxs(1, 1);
-    mv.visitEnd();
-  }
-
-  private void createGeneratorMethod(final ClassWriter cw) {
-    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "__internal", "("
-        + GENERATOR.type() + ")V", "(L" + GENERATOR.name() + "<L" + this.built
-        + ";+L" + BUILDER_INTERFACE.name() + "<L" + this.built + ";>;>;)V",
-        null);
+    
     mv.visitVarInsn(ALOAD, 0);
     mv.visitVarInsn(ALOAD, 1);
     mv.visitFieldInsn(PUTFIELD, this.builderName, GENERATOR_FIELD,
         GENERATOR.type());
+
+    for (Property each: this.uniqueProperties() ) {
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitInsn(ACONST_NULL);
+      mv.visitFieldInsn(PUTFIELD, this.builderName, each.name(),
+          "Lorg/pitest/quickbuilder/Builder;");
+    }
+
     mv.visitInsn(RETURN);
-    mv.visitMaxs(2, 2);
+    mv.visitMaxs(1, 1);
     mv.visitEnd();
+        
   }
+  
+  
 
   private void createFields(final ClassWriter cw) {
-    final FieldVisitor fv1 = cw.visitField(ACC_PRIVATE, GENERATOR_FIELD,
+    final FieldVisitor fv1 = cw.visitField(ACC_PRIVATE + ACC_FINAL, GENERATOR_FIELD,
         GENERATOR.type(), "L" + GENERATOR.name() + "<L" + this.built + ";L"
             + this.builderName + ";>;", null);
     fv1.visitEnd();

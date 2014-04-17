@@ -56,7 +56,7 @@ import com.example.immutable.MixedValueBuilder;
 import com.example.immutable.MixedValueGenerator;
 
 public class ImmutableBuilderTest {
-
+  
   @Test
   public void shouldCreateABuilder() {
     final StatelessBeanBuilder testee = QB.builder(StatelessBeanBuilder.class);

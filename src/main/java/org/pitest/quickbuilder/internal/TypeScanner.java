@@ -1,5 +1,6 @@
 package org.pitest.quickbuilder.internal;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -45,8 +46,8 @@ public class TypeScanner<T, B extends Builder<T>> {
 
     try {
       final Class<B> builderClass = findOrMakeBuilder(proxiedName, builderName);
-      final B b = builderClass.newInstance();
-      ((_InternalQuickBuilder<T>) b).__internal(pickGenerator());
+      Constructor<B> c = builderClass.getDeclaredConstructor(Generator.class);
+      final B b = c.newInstance(this.pickGenerator());
       return b;
     } catch (final QuickBuilderError e) {
       throw e;
