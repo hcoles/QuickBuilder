@@ -12,6 +12,8 @@ public interface FruitBuilder extends Builder<FruitBean> {
 
   FruitBuilder withId(String id);
   
+  FruitBuilder withId(Builder<String> ids);
+  
   FruitBuilder withFoo(String id);
   
   String _Foo();

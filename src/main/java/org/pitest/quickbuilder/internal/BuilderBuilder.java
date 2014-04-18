@@ -84,7 +84,7 @@ class BuilderBuilder {
 
     createPropertyMethods(cw);
 
-    createBuildMethod(cw, this.ps);
+    createBuildMethod(cw);
     createBridgeForBuildMethod(cw);
 
     cw.visitEnd();
@@ -446,7 +446,7 @@ class BuilderBuilder {
     }
   }
 
-  private void createBuildMethod(final ClassWriter cw, final List<Property> ps) {
+  private void createBuildMethod(final ClassWriter cw) {
     MethodVisitor mv;
     mv = cw.visitMethod(ACC_PUBLIC, "build", "()L" + this.built + ";", null,
         null);
@@ -476,7 +476,7 @@ class BuilderBuilder {
     mv.visitVarInsn(ASTORE, 1);
 
     mv.visitLabel(setProps);
-    for (final Property p : ps) {
+    for (final Property p : this.uniqueProperties()) {
       if (p.isHasSetter()) {
         callSetterIfPropertyHasValue(mv, p);
       }
