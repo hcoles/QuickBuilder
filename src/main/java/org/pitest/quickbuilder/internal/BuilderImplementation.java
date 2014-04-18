@@ -1,5 +1,8 @@
 package org.pitest.quickbuilder.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.MutableBuilder;
 
@@ -23,6 +26,14 @@ public class BuilderImplementation {
     }
     
     return b;
+  }
+  
+  public static List<?> buildSequence(Builder<?> b, int size) {
+    List<Object> l = new ArrayList<Object>(size);
+    for ( int i = 0; i != size; i++ ) {
+      l.add(b.build());
+    }
+    return l;
   }
   
 }

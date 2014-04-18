@@ -8,6 +8,10 @@ class TypeName {
     return new TypeName(s);
   }
   
+  static TypeName fromClass(Class<?> c) {
+    return new TypeName(c.getName().replace(".", "/"));
+  }
+  
   TypeName(String name) {
     this.name = name;
   }

@@ -1,6 +1,6 @@
 package org.pitest.quickbuilder.internal;
 
-import static org.objectweb.asm.Opcodes.ACC_BRIDGE;
+import static org.objectweb.asm.Opcodes.*;
 import static org.objectweb.asm.Opcodes.ACC_FINAL;
 import static org.objectweb.asm.Opcodes.ACC_PRIVATE;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
@@ -35,16 +35,20 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.pitest.quickbuilder.Builder;
+import org.pitest.quickbuilder.Generator;
+import org.pitest.quickbuilder.SequenceBuilder;
 
 class BuilderBuilder {
 
-  private static final TypeName STORED_VALUE_BUILDER = TypeName
-                                                         .fromString("org/pitest/quickbuilder/internal/StoredValueBuilder");
+  private static final TypeName STORED_VALUE_BUILDER = TypeName.fromClass(StoredValueBuilder.class);
   private static final String   GENERATOR_FIELD      = "___generator";
   private static final TypeName BUILDER_INTERFACE    = TypeName
-                                                         .fromString("org/pitest/quickbuilder/Builder");
+                                                         .fromClass(Builder.class);
   private static final TypeName GENERATOR            = TypeName
-                                                         .fromString("org/pitest/quickbuilder/Generator");
+                                                         .fromClass(Generator.class);
+  
+  private static final TypeName SEQUENCE_INTERFACE    = TypeName.fromClass(SequenceBuilder.class);
 
   private final String          builderName;
   private final String          proxiedName;
@@ -68,7 +72,7 @@ class BuilderBuilder {
     cw.visit(Opcodes.V1_5, ACC_PUBLIC + ACC_SUPER, this.builderName,
         "Ljava/lang/Object;L" + BUILDER_INTERFACE.name() + "<L" + this.built
             + ";>;" + "L" + this.proxiedName + ";", "java/lang/Object",
-        new String[] { BUILDER_INTERFACE.name(), this.proxiedName });
+        new String[] { BUILDER_INTERFACE.name(), SEQUENCE_INTERFACE.name(),this.proxiedName });
 
     createFields(cw);
 
@@ -87,6 +91,9 @@ class BuilderBuilder {
     createBuildMethod(cw);
     createBridgeForBuildMethod(cw);
 
+    createSequenceMethod(cw);
+    
+    
     cw.visitEnd();
 
     final byte[] bs = cw.toByteArray();
@@ -94,6 +101,8 @@ class BuilderBuilder {
     return bs;
 
   }
+
+
 
   private void createPropertyMethods(final ClassWriter cw) {
     for (final Property each : this.ps) {
@@ -538,4 +547,15 @@ class BuilderBuilder {
     mv.visitEnd();
   }
 
+  private void createSequenceMethod(ClassWriter cw) {
+    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "build", "(I)Ljava/util/List;", "(I)Ljava/util/List<L" + this.built + ";>;", null);
+      mv.visitCode();
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitVarInsn(ILOAD, 1);
+      mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/internal/BuilderImplementation", "buildSequence", "(Lorg/pitest/quickbuilder/Builder;I)Ljava/util/List;", false);
+      mv.visitInsn(ARETURN);
+      mv.visitMaxs(2, 2);
+      mv.visitEnd();  
+  }
+    
 }
