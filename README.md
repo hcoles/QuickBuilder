@@ -22,7 +22,7 @@ It's on [maven central](http://search.maven.org/#search|ga|1|a%3A%22quickbuilder
 <dependency>
     <groupId>org.pitest.quickbuilder</groupId>
     <artifactId>quickbuilder</artifactId>
-    <version>0.0.2</version>
+    <version>1.0</version>
 </dependency>
 ```
 
@@ -253,4 +253,10 @@ Other approaches you might want to consider
 
 * https://code.google.com/p/make-it-easy/ 
 * http://code.google.com/a/eclipselabs.org/p/bob-the-builder/
+
+# Releases
+
+## 1.0
+
+Initial release
 
