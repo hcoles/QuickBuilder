@@ -16,9 +16,7 @@ QuickBuilder is **not** a code generator. Builders are generated at runtime, the
 
 ## Download
 
-It's on maven central
-
-http://search.maven.org/#search|ga|1|a%3A%22quickbuilder%22
+It's on [maven central](http://search.maven.org/#search|ga|1|a%3A%22quickbuilder%22)
 
 ```xml
 <dependency>
