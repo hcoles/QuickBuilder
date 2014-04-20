@@ -160,6 +160,33 @@ Person sue = youngPerson.but().withName("Sue").build();
 
 ```
 
+### Respects default values
+
+If you don't supply a value for a property QuickBuilder will not try to overwrite it.
+
+Given the bean
+
+```java
+public class Person {
+
+    private int age;
+
+    public Person() {
+      age = 18; // set a default
+    }
+
+    // etc
+}
+```
+
+Common hand rolled builder implementations would overwrite the default age with primitive int default of 0 when no value was supplied, but calling
+
+```java
+   Person p = QB.builder(PersonBuilder).withName("Tom").build();
+```
+
+Will return a person called Tom with the default age of 18.
+
 ### Sequences
 
 Normally a builder returns objects built from the same values each time build is called. Occasionally you may want to create a series of objects that differ from each other on one or more property. Allthough you could create these by calling `with` methods generating objects from a sequence may result in more readable code.
@@ -179,7 +206,7 @@ person.build(); // a person named Barry with age 29
 person.build(); // a person named Sarah with age 42
 ```
 
-You may need place the built objects into a Collection. Instead of doing it by hand you can make your builder extend `org.pitest.quickbuilder.SequenceBuilder`, in which case QuickBuilder will supply you with a method `List<T> build(int number to build)`
+You may need place the built objects into a Collection. Instead of doing it by hand you can make your builder extend `org.pitest.quickbuilder.SequenceBuilder`, in which case QuickBuilder will supply you with a method `List<T> build(int numberToBuild)`
 
 
 ```java
@@ -189,12 +216,16 @@ interface PersonBuilder extends SequenceBuilder<Person> {
 }
 
 
-PersonBuilder youngPerson = QB.builder(PersonBuilder.class)
+PersonBuilder person = QB.builder(PersonBuilder.class)
                             .withName(from(asList("Paul", "Barry", "Sarah")))
                             .withAge(from(asList(20,29,42)))
 
-List<Person> people = youngPerson.build(3); // creates list containing Paul, Barry and Sarah
+List<Person> people = person.build(3); // creates list containing Paul, Barry and Sarah
 ```
+
+
+
+
 
 ## Features
 
