@@ -1,6 +1,6 @@
 package org.pitest.quickbuilder.internal;
 
-import static org.objectweb.asm.Opcodes.*;
+import static org.objectweb.asm.Opcodes.ACC_BRIDGE;
 import static org.objectweb.asm.Opcodes.ACC_FINAL;
 import static org.objectweb.asm.Opcodes.ACC_PRIVATE;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
@@ -17,6 +17,7 @@ import static org.objectweb.asm.Opcodes.GETFIELD;
 import static org.objectweb.asm.Opcodes.GOTO;
 import static org.objectweb.asm.Opcodes.IFNONNULL;
 import static org.objectweb.asm.Opcodes.IFNULL;
+import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
@@ -109,6 +110,7 @@ class BuilderBuilder {
       createWithMethod(cw, each);
       if (!each.isBuilder()) {
         createAccessor(cw, each);
+        createMaybeProperty(cw, each);
       }
     }
   }
@@ -236,7 +238,7 @@ class BuilderBuilder {
     mv.visitEnd();
 
   }
-
+  
   private void castPrimitives(final Property each, final MethodVisitor mv) {
     if (each.getSort() == Type.INT) {
       mv.visitTypeInsn(CHECKCAST, "java/lang/Integer");
@@ -556,6 +558,35 @@ class BuilderBuilder {
       mv.visitInsn(ARETURN);
       mv.visitMaxs(2, 2);
       mv.visitEnd();  
+  }
+  
+  private void createMaybeProperty(final ClassWriter cw, final Property each) {
+    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "__" + each.name(), "()Lorg/pitest/quickbuilder/Maybe;", "()Lorg/pitest/quickbuilder/Maybe<"
+        + each.type() + ">;", null); 
+        
+    mv.visitCode();
+      Label l0 = new Label();
+      Label l1 = new Label();
+      Label l2 = new Label();
+      mv.visitTryCatchBlock(l0, l1, l2, "org/pitest/quickbuilder/QuickBuilderError");
+      mv.visitLabel(l0);
+
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitMethodInsn(INVOKEVIRTUAL, this.builderName, "_" + each.name(), "()" + each.type(), false);
+      convertPrimitiveToWrappingObject(each, mv);
+      
+      mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/Maybe", "some", "(Ljava/lang/Object;)Lorg/pitest/quickbuilder/Maybe;", false);
+      mv.visitLabel(l1);
+      mv.visitInsn(ARETURN);
+      mv.visitLabel(l2);
+
+      mv.visitVarInsn(ASTORE, 1);
+
+      mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/Maybe", "none", "()Lorg/pitest/quickbuilder/Maybe$None;", false);
+      mv.visitInsn(ARETURN);
+        mv.visitMaxs(1, 2);
+      mv.visitEnd();
+      
   }
     
 }

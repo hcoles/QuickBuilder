@@ -23,6 +23,7 @@ import com.example.beans.GenericPropertiesBean;
 import com.example.beans.GenericPropertiesBeanBuilder;
 import com.example.beans.PropertyOverridenByUnderscore;
 import com.example.beans.StatelessBeanBuilder;
+import com.example.beans.StringBean;
 import com.example.beans.StringBeanBuilder;
 import com.example.beans.generics.BuilderDeclaringBaseBuilderProperty;
 import com.example.beans.generics.BuilderDeclaringBoundedWildcardProperty;
@@ -45,6 +46,7 @@ import com.example.beans.primitives.IntBean;
 import com.example.beans.primitives.IntBeanBuilder;
 import com.example.beans.primitives.LongBean;
 import com.example.beans.primitives.LongBeanBuilder;
+import com.example.beans.primitives.PrimitiveBeanBuilder;
 import com.example.beans.primitives.ShortBean;
 import com.example.beans.primitives.ShortBeanBuilder;
 import com.example.example.Apple;
@@ -239,7 +241,33 @@ public class ImmutableBuilderTest {
         intGenerator());
     assertThat(builder.withI(42).build().i()).isEqualTo(42);
   }
+  
+  public interface MaybeStringBeanBuilder extends Builder<StringBean> {
+    
+    MaybeStringBeanBuilder withName(String name);
+    
+    Maybe<String> __Name();
+    
+  }
+  
+  @Test
+  public void shouldImplementUnderscoreAccessorsForMaybes() {
+    MaybeStringBeanBuilder builder = QB.builder(MaybeStringBeanBuilder.class);
+    assertThat(builder.__Name().hasNone()).isTrue();
+    assertThat(builder.withName("foo").__Name().value()).isEqualTo("foo");
+  }
 
+  
+  @Test
+  public void shouldImplementUnderscoreAccessorsForPrimitiveMaybes() {
+    PrimitiveBeanBuilder builder = QB.builder(PrimitiveBeanBuilder.class);
+    assertThat(builder.__I().hasNone()).isTrue();
+    assertThat(builder.__D().hasNone()).isTrue();
+    assertThat(builder.withI(42).__I().value()).isEqualTo(42);
+    assertThat(builder.withD(1).__D().value()).isEqualTo(1);
+  }
+
+  
   @Test
   public void shouldConstructImmutableMixedValueTypes() {
     final MixedValueBuilder builder = QB.builder(MixedValueBuilder.class,

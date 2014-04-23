@@ -1,6 +1,7 @@
 package com.example.beans.primitives;
 
 import org.pitest.quickbuilder.Builder;
+import org.pitest.quickbuilder.Maybe;
 
 public interface PrimitiveBeanBuilder extends Builder<PrimitiveBean> {
 
@@ -19,5 +20,9 @@ public interface PrimitiveBeanBuilder extends Builder<PrimitiveBean> {
   PrimitiveBeanBuilder withB(boolean b);
 
   PrimitiveBeanBuilder withBy(byte by);
+  
+  Maybe<Integer> __I();
+  
+  Maybe<Double> __D();
 
 }
