@@ -15,4 +15,10 @@ public class StoredValueBuilder<T> implements Builder<T> {
     return value;
   }
 
+
+  @Override
+  public int valueLimit() {
+    return -1;
+  }
+  
 }

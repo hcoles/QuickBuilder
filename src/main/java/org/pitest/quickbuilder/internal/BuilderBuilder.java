@@ -15,6 +15,7 @@ import static org.objectweb.asm.Opcodes.CHECKCAST;
 import static org.objectweb.asm.Opcodes.DUP;
 import static org.objectweb.asm.Opcodes.GETFIELD;
 import static org.objectweb.asm.Opcodes.GOTO;
+import static org.objectweb.asm.Opcodes.*;
 import static org.objectweb.asm.Opcodes.IFNONNULL;
 import static org.objectweb.asm.Opcodes.IFNULL;
 import static org.objectweb.asm.Opcodes.ILOAD;
@@ -22,6 +23,8 @@ import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static org.objectweb.asm.Opcodes.IRETURN;
+import static org.objectweb.asm.Opcodes.ISTORE;
 import static org.objectweb.asm.Opcodes.NEW;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
 import static org.objectweb.asm.Opcodes.RETURN;
@@ -94,6 +97,7 @@ class BuilderBuilder {
 
     createSequenceMethod(cw);
     
+    createValueLimitMethod(cw);
     
     cw.visitEnd();
 
@@ -214,12 +218,12 @@ class BuilderBuilder {
 
     final Label l = new Label();
     mv.visitJumpInsn(IFNONNULL, l);
-    mv.visitTypeInsn(NEW, "org/pitest/quickbuilder/QuickBuilderError");
+    mv.visitTypeInsn(NEW, "org/pitest/quickbuilder/NoValueAvailableError");
     mv.visitInsn(DUP);
     mv.visitLdcInsn("_" + each.name()
         + "() called, but no value has been set for property " + each.name());
     mv.visitMethodInsn(INVOKESPECIAL,
-        "org/pitest/quickbuilder/QuickBuilderError", "<init>",
+        "org/pitest/quickbuilder/NoValueAvailableError", "<init>",
         "(Ljava/lang/String;)V", false);
     mv.visitInsn(ATHROW);
 
@@ -588,5 +592,26 @@ class BuilderBuilder {
       mv.visitEnd();
       
   }
+  
+  private void createValueLimitMethod(ClassWriter cw) {
+    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "valueLimit", "()I", null, null);
+    mv.visitCode();
+    mv.visitInsn(ICONST_M1);
+    mv.visitVarInsn(ISTORE, 1);
+    
+    for ( Property each : this.uniqueProperties() ) {
+      mv.visitVarInsn(ILOAD, 1);
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitFieldInsn(GETFIELD, this.builderName, each.name(),
+          "Lorg/pitest/quickbuilder/Builder;");
+      mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/internal/BuilderImplementation", "findLimit", "(ILorg/pitest/quickbuilder/Builder;)I", false);
+      mv.visitVarInsn(ISTORE, 1);
+    }
+    
+    mv.visitVarInsn(ILOAD, 1);
+    mv.visitInsn(IRETURN);
+    mv.visitMaxs(1, 1);
+    mv.visitEnd();  
+  }  
     
 }

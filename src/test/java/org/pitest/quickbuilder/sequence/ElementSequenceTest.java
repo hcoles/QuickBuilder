@@ -28,5 +28,15 @@ public class ElementSequenceTest {
     assertThat(testee.build()).isEqualTo("a");
     assertThat(testee.build()).isEqualTo("b");
   }
+  
+  @Test
+  public void shouldReportNumberOfAvailableValues() {
+    testee = ElementSequence.from(Arrays.asList("a", "b"));
+    assertThat(testee.valueLimit()).isEqualTo(2);
+    testee.build();
+    assertThat(testee.valueLimit()).isEqualTo(1);
+    testee.build();
+    assertThat(testee.valueLimit()).isEqualTo(0);    
+  }  
 
 }

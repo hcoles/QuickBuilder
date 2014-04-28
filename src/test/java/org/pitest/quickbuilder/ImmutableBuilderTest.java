@@ -396,7 +396,7 @@ public class ImmutableBuilderTest {
         new MixedValueGenerator());
     try {
       builder.withF(1.0f).build();
-    } catch (QuickBuilderError e) {
+    } catch (NoValueAvailableError e) {
       assertThat(e).hasMessageContaining("no value");
     }
     // fail

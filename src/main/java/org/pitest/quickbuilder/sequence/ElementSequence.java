@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.pitest.quickbuilder.MutableBuilder;
+import org.pitest.quickbuilder.NoValueAvailableError;
 import org.pitest.quickbuilder.internal.Iterables;
 
 /**
@@ -28,12 +29,20 @@ public final class ElementSequence<T> implements MutableBuilder<T> {
   
   @Override
   public T build() {
+    if ( valueLimit() == 0 ) {
+      throw new NoValueAvailableError("Requested a value from sequence, but no values available");
+    }
     return current.next();
   }
 
   @Override
   public ElementSequence<T> but() {
     return new ElementSequence<T>(ts.subList(current.nextIndex(), ts.size()));
+  }
+
+  @Override
+  public int valueLimit() {
+    return but().ts.size();
   }
 
 }

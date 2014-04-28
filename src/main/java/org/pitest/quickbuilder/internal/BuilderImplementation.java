@@ -36,4 +36,14 @@ public class BuilderImplementation {
     return l;
   }
   
+  public static int findLimit(int initial, Builder<?> b) {
+    if ( b != null ) {
+      int val = b.valueLimit();
+      if (initial == -1 || (val != -1 && val < initial) ) {
+        return val;
+      }
+    }
+    return initial;
+  }
+  
 }

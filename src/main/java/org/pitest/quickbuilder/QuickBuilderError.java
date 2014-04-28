@@ -1,6 +1,6 @@
 package org.pitest.quickbuilder;
 
-public final class QuickBuilderError extends RuntimeException {
+public class QuickBuilderError extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
