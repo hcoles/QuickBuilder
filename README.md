@@ -253,6 +253,7 @@ Other approaches you might want to consider
 
 * https://code.google.com/p/make-it-easy/ 
 * http://code.google.com/a/eclipselabs.org/p/bob-the-builder/
+* http://projectlombok.org/api/lombok/experimental/Builder.html
 
 # Releases
 
