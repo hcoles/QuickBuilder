@@ -3,6 +3,11 @@ package org.pitest.quickbuilder.sequence;
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.Maybe;
 
+/**
+ * Builds a constant value
+ *
+ * @param <T> Type to build
+ */
 public class ConstantBuilder<T> implements Builder<T> {
 
   private final T value;

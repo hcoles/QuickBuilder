@@ -4,10 +4,12 @@ import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.Maybe;
 import org.pitest.quickbuilder.NoValueAvailableError;
 
+/**
+ * Builds nothing
+ *
+ * @param <T> Type to never build
+ */
 public class NonBuilder<T> implements Builder<T> {
-
-  Builder<T> b;
-  Builder<T> c;
 
   @Override
   public T build() {

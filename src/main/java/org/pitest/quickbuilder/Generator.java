@@ -5,10 +5,8 @@ package org.pitest.quickbuilder;
  * Implementations of this interface can be used to construct and set values on
  * classes that QuickBuilder cannot handle automatically.
  * 
- * @param <T>
- *          The built type
- * @param <B>
- *          The builder type that produces the built type
+ * @param <T> The built type
+ * @param <B> The builder type that produces the built type
  */
 public interface Generator<B extends Builder<T>, T> {
 

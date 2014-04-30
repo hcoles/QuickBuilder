@@ -24,9 +24,9 @@ public class SequencesTest {
 
   @Test
   public void shouldBuildListsOfRequestedSize() {
-    FruitBuilder builder = QB.builder(FruitBuilder.class).withId(
+    final FruitBuilder builder = QB.builder(FruitBuilder.class).withId(
         ElementSequence.from(Arrays.asList("repeated", "two", "repeated")));
-    List<FruitBean> expected = Sequences.build(builder, 2);
+    final List<FruitBean> expected = Sequences.build(builder, 2);
     assertThat(expected.size()).isEqualTo(2);
     assertThat(expected).haveExactly(1, fruitWithId("repeated"));
     assertThat(expected).haveExactly(1, fruitWithId("two"));
@@ -34,11 +34,11 @@ public class SequencesTest {
 
   @Test
   public void shouldBuildListsOfRequestedSizeViaInstanceMethod() {
-    FruitBuilder builder = QB.builder(FruitBuilder.class);
-    List<FruitBean> expected = builder.build(2);
+    final FruitBuilder builder = QB.builder(FruitBuilder.class);
+    final List<FruitBean> expected = builder.build(2);
     assertThat(expected.size()).isEqualTo(2);
   }
-  
+
   @Test
   public void shouldConsumeAllOfSmallestSequencesWhenBuidAllCalledViaInstanceMethod() {
     final FruitBuilder builder = QB.builder(FruitBuilder.class).withId(
@@ -46,7 +46,7 @@ public class SequencesTest {
     final List<FruitBean> actual = builder.buildAll();
     assertThat(actual).hasSize(2);
   }
-  
+
   private Condition<FruitBean> fruitWithId(final String id) {
     return new Condition<FruitBean>() {
       @Override

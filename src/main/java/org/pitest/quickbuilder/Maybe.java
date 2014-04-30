@@ -5,11 +5,10 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * Holder for one or no values - the typesafe null pattern. Finally included in
- * Java 8 as optional, but implemented here for use with early jdks.
+ * Holder for one or no values - the typesafe null pattern. No included in
+ * Java 8 as Optional, but implemented here for use with earlier jdks.
  * 
- * @param <T>
- *          Type to hold
+ * @param <T> Type to hold
  */
 public abstract class Maybe<T> implements Iterable<T>, Serializable {
 

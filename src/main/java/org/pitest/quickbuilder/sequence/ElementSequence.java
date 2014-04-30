@@ -11,8 +11,7 @@ import org.pitest.quickbuilder.internal.Iterables;
 /**
  * Generates a builder that iterates through the supplied values.
  * 
- * @param <T>
- *          Type to build
+ * @param <T> Type to build
  */
 public final class ElementSequence<T> implements Builder<T> {
 

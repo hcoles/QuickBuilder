@@ -40,14 +40,10 @@ public abstract class QB {
    * expensive as it will trigger the generation of a class, subsequent calls
    * will be cheap as the class will be loaded into the jvm like any other.
    * 
-   * @param builder
-   *          Interface to implement
-   * @param seed
-   *          Function object that constructs instance of built type
-   * @param <T>
-   *          Type of class to be built
-   * @param <B>
-   *          Type of builder interface
+   * @param builder Interface to implement
+   * @param seed Function object that constructs instance of built type
+   * @param <T> Type of class to be built
+   * @param <B> Type of builder interface
    * @return A builder instance
    */
   @SuppressWarnings("unchecked")

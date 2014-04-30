@@ -6,8 +6,7 @@ package org.pitest.quickbuilder;
  * should be passed to the {@link QB} class which will generate an
  * implementation at runtime.
  * 
- * @param <T>
- *          Type to be built.
+ * @param <T> Type to be built.
  */
 public interface Builder<T> {
 

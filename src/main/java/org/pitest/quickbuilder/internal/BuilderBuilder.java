@@ -54,16 +54,14 @@ class BuilderBuilder {
                                                          .fromClass(Builder.class);
   private static final TypeName GENERATOR            = TypeName
                                                          .fromClass(Generator.class);
-  
-  private static final TypeName SequenceBuilder            = TypeName
-      .fromClass(SequenceBuilder.class);
 
+  private static final TypeName SequenceBuilder      = TypeName
+                                                         .fromClass(SequenceBuilder.class);
 
   private final String          builderName;
   private final String          proxiedName;
   private final String          built;
   private final List<Property>  ps;
-
 
   BuilderBuilder(final String builderName, final String proxiedName,
       final String built, final List<Property> ps) {
@@ -80,7 +78,8 @@ class BuilderBuilder {
     cw.visit(Opcodes.V1_5, ACC_PUBLIC + ACC_SUPER, this.builderName,
         "Ljava/lang/Object;L" + BUILDER_INTERFACE.name() + "<L" + this.built
             + ";>;" + "L" + this.proxiedName + ";", "java/lang/Object",
-        new String[] { BUILDER_INTERFACE.name(), SequenceBuilder.name(),this.proxiedName });
+        new String[] { BUILDER_INTERFACE.name(), SequenceBuilder.name(),
+            this.proxiedName });
 
     createFields(cw);
 
@@ -183,7 +182,6 @@ class BuilderBuilder {
       }
     }
   }
-
 
   private void createCopyConstructor(final ClassWriter cw) {
 
@@ -619,26 +617,33 @@ class BuilderBuilder {
     mv.visitEnd();
 
   }
-  
-  private void createSequenceBuildMethod(ClassWriter cw) {
-    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "build", "(I)Ljava/util/List;", "(I)Ljava/util/List<L" + this.built + ";>;", null);
-      mv.visitCode();
-      mv.visitVarInsn(ALOAD, 0);
-      mv.visitVarInsn(ILOAD, 1);
-      mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/sequence/Sequences", "build", "(Lorg/pitest/quickbuilder/Builder;I)Ljava/util/List;", false);
-      mv.visitInsn(ARETURN);
-      mv.visitMaxs(2, 2);
-      mv.visitEnd();  
+
+  private void createSequenceBuildMethod(final ClassWriter cw) {
+    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "build",
+        "(I)Ljava/util/List;", "(I)Ljava/util/List<L" + this.built + ";>;",
+        null);
+    mv.visitCode();
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitVarInsn(ILOAD, 1);
+    mv.visitMethodInsn(INVOKESTATIC,
+        "org/pitest/quickbuilder/sequence/Sequences", "build",
+        "(Lorg/pitest/quickbuilder/Builder;I)Ljava/util/List;", false);
+    mv.visitInsn(ARETURN);
+    mv.visitMaxs(2, 2);
+    mv.visitEnd();
   }
-  
-  private void createBuildAllMethod(ClassWriter cw) {
-    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "buildAll", "()Ljava/util/List;", "()Ljava/util/List<L" + this.built + ";>;", null);
-      mv.visitCode();
-      mv.visitVarInsn(ALOAD, 0);
-      mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/sequence/Sequences", "buildAll", "(Lorg/pitest/quickbuilder/Builder;)Ljava/util/List;", false);
-      mv.visitInsn(ARETURN);
-      mv.visitMaxs(2, 2);
-      mv.visitEnd();  
+
+  private void createBuildAllMethod(final ClassWriter cw) {
+    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "buildAll",
+        "()Ljava/util/List;", "()Ljava/util/List<L" + this.built + ";>;", null);
+    mv.visitCode();
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitMethodInsn(INVOKESTATIC,
+        "org/pitest/quickbuilder/sequence/Sequences", "buildAll",
+        "(Lorg/pitest/quickbuilder/Builder;)Ljava/util/List;", false);
+    mv.visitInsn(ARETURN);
+    mv.visitMaxs(2, 2);
+    mv.visitEnd();
   }
 
 }
