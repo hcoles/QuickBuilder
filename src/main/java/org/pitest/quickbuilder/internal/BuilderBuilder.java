@@ -1,6 +1,6 @@
 package org.pitest.quickbuilder.internal;
 
-import static org.objectweb.asm.Opcodes.ACC_BRIDGE;
+import static org.objectweb.asm.Opcodes.*;
 import static org.objectweb.asm.Opcodes.ACC_FINAL;
 import static org.objectweb.asm.Opcodes.ACC_PRIVATE;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
@@ -15,16 +15,12 @@ import static org.objectweb.asm.Opcodes.CHECKCAST;
 import static org.objectweb.asm.Opcodes.DUP;
 import static org.objectweb.asm.Opcodes.GETFIELD;
 import static org.objectweb.asm.Opcodes.GOTO;
-import static org.objectweb.asm.Opcodes.*;
 import static org.objectweb.asm.Opcodes.IFNONNULL;
 import static org.objectweb.asm.Opcodes.IFNULL;
-import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
-import static org.objectweb.asm.Opcodes.IRETURN;
-import static org.objectweb.asm.Opcodes.ISTORE;
 import static org.objectweb.asm.Opcodes.NEW;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
 import static org.objectweb.asm.Opcodes.RETURN;
@@ -41,18 +37,16 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.Generator;
-import org.pitest.quickbuilder.SequenceBuilder;
+import org.pitest.quickbuilder.sequence.ConstantBuilder;
 
 class BuilderBuilder {
 
-  private static final TypeName STORED_VALUE_BUILDER = TypeName.fromClass(StoredValueBuilder.class);
+  private static final TypeName STORED_VALUE_BUILDER = TypeName.fromClass(ConstantBuilder.class);
   private static final String   GENERATOR_FIELD      = "___generator";
   private static final TypeName BUILDER_INTERFACE    = TypeName
                                                          .fromClass(Builder.class);
   private static final TypeName GENERATOR            = TypeName
                                                          .fromClass(Generator.class);
-  
-  private static final TypeName SEQUENCE_INTERFACE    = TypeName.fromClass(SequenceBuilder.class);
 
   private final String          builderName;
   private final String          proxiedName;
@@ -76,7 +70,7 @@ class BuilderBuilder {
     cw.visit(Opcodes.V1_5, ACC_PUBLIC + ACC_SUPER, this.builderName,
         "Ljava/lang/Object;L" + BUILDER_INTERFACE.name() + "<L" + this.built
             + ";>;" + "L" + this.proxiedName + ";", "java/lang/Object",
-        new String[] { BUILDER_INTERFACE.name(), SEQUENCE_INTERFACE.name(),this.proxiedName });
+        new String[] { BUILDER_INTERFACE.name(), this.proxiedName });
 
     createFields(cw);
 
@@ -94,10 +88,11 @@ class BuilderBuilder {
 
     createBuildMethod(cw);
     createBridgeForBuildMethod(cw);
-
-    createSequenceMethod(cw);
+            
+    createHasNextMethod(cw);
+    createNextMethod(cw);
     
-    createValueLimitMethod(cw);
+    
     
     cw.visitEnd();
 
@@ -107,6 +102,65 @@ class BuilderBuilder {
 
   }
 
+  private void createNextMethod(ClassWriter cw) {
+    final MethodVisitor mv  = cw.visitMethod(ACC_PUBLIC, "next", "()Lorg/pitest/quickbuilder/Maybe;", "()Lorg/pitest/quickbuilder/Maybe<Lorg/pitest/quickbuilder/Builder<TT;>;>;", null);
+    mv.visitCode();
+    
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitMethodInsn(INVOKEVIRTUAL, this.builderName, "hasNext", "()Z", false);
+    Label l1 = new Label();
+    mv.visitJumpInsn(IFEQ, l1);
+    
+    mv.visitVarInsn(ALOAD, 0);
+    
+    mv.visitTypeInsn(NEW, this.builderName);
+    mv.visitInsn(DUP);
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD,
+        GENERATOR.type());
+
+    for (final Property each : this.uniqueProperties()) {
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitFieldInsn(GETFIELD, this.builderName, each.name(),
+          "Lorg/pitest/quickbuilder/Builder;");
+      
+     
+      Label nullCheck = new Label();
+      mv.visitJumpInsn(IFNULL, nullCheck);
+      
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitFieldInsn(GETFIELD, this.builderName, each.name(),
+          "Lorg/pitest/quickbuilder/Builder;");
+      
+      mv.visitMethodInsn(INVOKEINTERFACE, "org/pitest/quickbuilder/Builder", "next", "()Lorg/pitest/quickbuilder/Maybe;", true);
+      mv.visitMethodInsn(INVOKEVIRTUAL, "org/pitest/quickbuilder/Maybe", "value", "()Ljava/lang/Object;", false);  
+      mv.visitTypeInsn(CHECKCAST, "org/pitest/quickbuilder/Builder");
+      Label propHandled = new Label();
+      mv.visitJumpInsn(GOTO, propHandled);
+      mv.visitLabel(nullCheck);
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitFieldInsn(GETFIELD, this.builderName, each.name(),
+          "Lorg/pitest/quickbuilder/Builder;");
+      mv.visitLabel(propHandled);
+      
+    }
+
+    mv.visitMethodInsn(INVOKESPECIAL, this.builderName, "<init>",
+        this.initDescriptor(), false);
+    
+    
+    mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/Maybe", "some", "(Ljava/lang/Object;)Lorg/pitest/quickbuilder/Maybe;", false);
+    mv.visitInsn(ARETURN);
+    
+    mv.visitLabel(l1);
+    mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/Maybe", "none", "()Lorg/pitest/quickbuilder/Maybe$None;", false);
+    mv.visitInsn(ARETURN);
+    
+    mv.visitMaxs(1, 1);
+    mv.visitEnd();
+  
+  }
+  
 
 
   private void createPropertyMethods(final ClassWriter cw) {
@@ -553,16 +607,6 @@ class BuilderBuilder {
     mv.visitEnd();
   }
 
-  private void createSequenceMethod(ClassWriter cw) {
-    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "build", "(I)Ljava/util/List;", "(I)Ljava/util/List<L" + this.built + ";>;", null);
-      mv.visitCode();
-      mv.visitVarInsn(ALOAD, 0);
-      mv.visitVarInsn(ILOAD, 1);
-      mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/internal/BuilderImplementation", "buildSequence", "(Lorg/pitest/quickbuilder/Builder;I)Ljava/util/List;", false);
-      mv.visitInsn(ARETURN);
-      mv.visitMaxs(2, 2);
-      mv.visitEnd();  
-  }
   
   private void createMaybeProperty(final ClassWriter cw, final Property each) {
     final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "__" + each.name(), "()Lorg/pitest/quickbuilder/Maybe;", "()Lorg/pitest/quickbuilder/Maybe<"
@@ -593,25 +637,34 @@ class BuilderBuilder {
       
   }
   
-  private void createValueLimitMethod(ClassWriter cw) {
-    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "valueLimit", "()I", null, null);
-    mv.visitCode();
-    mv.visitInsn(ICONST_M1);
-    mv.visitVarInsn(ISTORE, 1);
-    
-    for ( Property each : this.uniqueProperties() ) {
-      mv.visitVarInsn(ILOAD, 1);
-      mv.visitVarInsn(ALOAD, 0);
-      mv.visitFieldInsn(GETFIELD, this.builderName, each.name(),
-          "Lorg/pitest/quickbuilder/Builder;");
-      mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/internal/BuilderImplementation", "findLimit", "(ILorg/pitest/quickbuilder/Builder;)I", false);
-      mv.visitVarInsn(ISTORE, 1);
-    }
-    
-    mv.visitVarInsn(ILOAD, 1);
-    mv.visitInsn(IRETURN);
-    mv.visitMaxs(1, 1);
-    mv.visitEnd();  
-  }  
+  private void createHasNextMethod(final ClassWriter cw) {
+   
+      final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "hasNext", "()Z", null, null);
+
+      mv.visitCode();
+      Label l1 = new Label();
+      
+      for ( Property each : this.uniqueProperties() ) {
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitFieldInsn(GETFIELD, this.builderName, each.name(), "Lorg/pitest/quickbuilder/Builder;");
+        Label nullCheck = new Label();
+        mv.visitJumpInsn(IFNULL, nullCheck);
+        mv.visitVarInsn(ALOAD, 0);
+        mv.visitFieldInsn(GETFIELD, this.builderName, each.name(), "Lorg/pitest/quickbuilder/Builder;");
+        mv.visitMethodInsn(INVOKEINTERFACE, "org/pitest/quickbuilder/Builder", "next", "()Lorg/pitest/quickbuilder/Maybe;", true);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "org/pitest/quickbuilder/Maybe", "hasSome", "()Z", false);
+        mv.visitJumpInsn(IFEQ, l1);
+        mv.visitLabel(nullCheck);
+      }
+
+      mv.visitInsn(ICONST_1);
+      mv.visitInsn(IRETURN);
+      mv.visitLabel(l1);
+      mv.visitInsn(ICONST_0);
+      mv.visitInsn(IRETURN);
+      mv.visitMaxs(1, 1);
+      mv.visitEnd();
+
+  }
     
 }

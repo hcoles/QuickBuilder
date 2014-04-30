@@ -5,12 +5,13 @@ import java.util.List;
 
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.MutableBuilder;
+import org.pitest.quickbuilder.sequence.ConstantBuilder;
 
 public class BuilderImplementation {
   
   public static Builder<?> wrapProperty(Object property) {
     if ( property instanceof Builder ) {
-      return new StoredValueBuilder<Object>(property);
+      return new ConstantBuilder<Object>(property);
     } else {
       return (Builder<?>) property;
     }
@@ -36,14 +37,5 @@ public class BuilderImplementation {
     return l;
   }
   
-  public static int findLimit(int initial, Builder<?> b) {
-    if ( b != null ) {
-      int val = b.valueLimit();
-      if (initial == -1 || (val != -1 && val < initial) ) {
-        return val;
-      }
-    }
-    return initial;
-  }
   
 }

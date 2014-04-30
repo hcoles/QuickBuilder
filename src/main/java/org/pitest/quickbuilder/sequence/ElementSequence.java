@@ -2,10 +2,11 @@ package org.pitest.quickbuilder.sequence;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
-import org.pitest.quickbuilder.MutableBuilder;
+import org.pitest.quickbuilder.Builder;
+import org.pitest.quickbuilder.Maybe;
 import org.pitest.quickbuilder.NoValueAvailableError;
+import org.pitest.quickbuilder.Transistion;
 import org.pitest.quickbuilder.internal.Iterables;
 
 /**
@@ -13,36 +14,39 @@ import org.pitest.quickbuilder.internal.Iterables;
  *
  * @param <T> Type to build
  */
-public final class ElementSequence<T> implements MutableBuilder<T> {
+public final class ElementSequence<T> implements Builder<T> {
   
   private final List<T> ts;
-  private final ListIterator<T> current;
+  private final int position;
 
-  private ElementSequence(List<T> ts) {
+  private ElementSequence(List<T> ts, int position) {
     this.ts = new ArrayList<T>(ts);
-    this.current = ts.listIterator();
+    this.position = position;
   }
   
   public static <T> ElementSequence<T> from(Iterable<T> ts) {
-    return new ElementSequence<T>(Iterables.asList(ts));
+    return new ElementSequence<T>(Iterables.asList(ts), 0);
   }
   
   @Override
   public T build() {
-    if ( valueLimit() == 0 ) {
+    if ( position >= ts.size() ) {
       throw new NoValueAvailableError("Requested a value from sequence, but no values available");
     }
-    return current.next();
+    return ts.get(position);
+  }
+
+  private boolean hasNext() {
+    return position + 1 < ts.size();
   }
 
   @Override
-  public ElementSequence<T> but() {
-    return new ElementSequence<T>(ts.subList(current.nextIndex(), ts.size()));
+  public Maybe<Builder<T>> next() {
+    if ( hasNext() ) {
+      return Maybe.<Builder<T>>some( new ElementSequence<T>(this.ts, this.position + 1));
+    }
+    return Maybe.none();
   }
 
-  @Override
-  public int valueLimit() {
-    return but().ts.size();
-  }
 
 }

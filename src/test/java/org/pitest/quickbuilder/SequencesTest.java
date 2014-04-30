@@ -1,7 +1,6 @@
 package org.pitest.quickbuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,43 +10,29 @@ import org.junit.Test;
 import org.pitest.quickbuilder.sequence.ElementSequence;
 
 import com.example.beans.CompositeBean;
-import com.example.beans.CompositeBeanBuilder;
 import com.example.beans.FruitBean;
 import com.example.beans.FruitBuilder;
-import com.example.immutable.MixedValueBuilder;
-import com.example.immutable.MixedValueGenerator;
 
 public class SequencesTest {
   
   
   @Test
-  public void shouldProvideValuesInCorrectOrder() {
+  public void shouldConsumeAllOfLimitedSequences() {
     FruitBuilder builder = QB.builder(FruitBuilder.class).withId(ElementSequence.from(Arrays.asList("one","two")));
-    assertEquals("one",builder.build().getId());
-    assertEquals("two",builder.build().getId());
+    List<FruitBean> actual = Sequences.buildAll(builder);
+    assertThat(actual).hasSize(2);
   }
 
-  @Test
-  public void shouldBuildListsOfRequestedSize() {
-    FruitBuilder builder = QB.builder(FruitBuilder.class).withId(ElementSequence.from(Arrays.asList("repeated","two","repeated")));
-    List<FruitBean> expected = builder.build(2);
-    assertThat(expected.size()).isEqualTo(2);
-    assertThat(expected).haveExactly(1, fruitWithId("repeated")); 
-    assertThat(expected).haveExactly(1, fruitWithId("two"));     
-  }
-  
-  @Test
-  public void shouldReportInfiniteAvailableValuesForSimpleBuilder() {
-    FruitBuilder builder = QB.builder(FruitBuilder.class);
-    assertThat(builder.valueLimit()).isEqualTo(-1);
-  }
-  
-  @Test
-  public void shouldReportNoAvailableValuesWhenChildSequenceExhausted() {
-    FruitBuilder builder = QB.builder(FruitBuilder.class).withId(ElementSequence.from(Arrays.asList("one","two")));
-    builder.build(2);
-    assertThat(builder.valueLimit()).isEqualTo(0);
-  }
+//  @Test
+//  public void shouldBuildListsOfRequestedSize() {
+//    FruitBuilder builder = QB.builder(FruitBuilder.class).withId(ElementSequence.from(Arrays.asList("repeated","two","repeated")));
+//    List<FruitBean> expected = builder.build(2);
+//    assertThat(expected.size()).isEqualTo(2);
+//    assertThat(expected).haveExactly(1, fruitWithId("repeated")); 
+//    assertThat(expected).haveExactly(1, fruitWithId("two"));     
+//  }
+//  
+
     
   public static class VeryComposite {
     
@@ -76,35 +61,12 @@ public class SequencesTest {
         
   }
   
-  public interface VeryCompositeBuilder extends SequenceBuilder<VeryComposite> {
+  public interface VeryCompositeBuilder extends Builder<VeryComposite> {
     VeryCompositeBuilder withA(Builder<CompositeBean> v);
     VeryCompositeBuilder withB(Builder<CompositeBean> v);
     VeryCompositeBuilder withC(Builder<CompositeBean> v);
   }
   
-  @Test
-  public void shouldReportNoAvailableValuesWhenOnlyOneChildSequenceExhausted() {
-    FruitBuilder fb = QB.builder(FruitBuilder.class).withId(ElementSequence.from(Arrays.asList("one","two")));
-    CompositeBeanBuilder cb = QB.builder(CompositeBeanBuilder.class).withFruit(fb);
-    
-    // no value set for b
-    VeryCompositeBuilder builder = QB.builder(VeryCompositeBuilder.class).withC(cb).withB(ElementSequence.from(Arrays.<CompositeBean>asList(null,null,null)));
-    
-    assertThat(builder.valueLimit()).isEqualTo(2);
-    builder.build(2);
-    assertThat(builder.valueLimit()).isEqualTo(0);
-  }
-      
-  
-  @Test
-  public void willReportInifiniteLimitForUserHandledTypesWhenRequiredValueIsMissing() {
-    final MixedValueBuilder builder = QB.builder(MixedValueBuilder.class,
-        new MixedValueGenerator());
-    // required values not set, but only user knows which values are required . . .
-    assertThat(builder.valueLimit()).isEqualTo(-1);
-  }  
-  
-
   
   private Condition<FruitBean> fruitWithId(final String id) {
     return new Condition<FruitBean>() {

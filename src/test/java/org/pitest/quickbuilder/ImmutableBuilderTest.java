@@ -4,10 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
+import org.pitest.quickbuilder.sequence.ElementSequence;
+import org.pitest.quickbuilder.sequence.NonBuilder;
 
 import com.example.beans.ArrayBean;
 import com.example.beans.ArrayBeanBuilder;
@@ -50,6 +53,7 @@ import com.example.beans.primitives.PrimitiveBeanBuilder;
 import com.example.beans.primitives.ShortBean;
 import com.example.beans.primitives.ShortBeanBuilder;
 import com.example.example.Apple;
+import com.example.example.Fruit;
 import com.example.example.FruitBuilders;
 import com.example.immutable.IntegerValue;
 import com.example.immutable.IntegerValueBuilder;
@@ -418,6 +422,7 @@ public class ImmutableBuilderTest {
 
   }
 
+  
   interface Inaccessible extends Builder<String> {
     
   }
@@ -432,4 +437,38 @@ public class ImmutableBuilderTest {
     }
   }
   
+
+  @Test
+  public void shouldReturnConstantNextWhenNoChildrenSet() {
+    FruitBuilder builder = QB.builder(FruitBuilder.class);
+    assertThat(builder.next().hasSome()).isTrue();
+  }
+  
+  @Test
+  public void shouldReturnConstantNextWhenNoChildrenAreConstants() {
+    FruitBuilder builder = QB.builder(FruitBuilder.class).withId("foo");
+    assertThat(builder.next().hasSome()).isTrue();
+    assertThat(builder.next().value().build().getId()).isEqualTo("foo");
+  }
+    
+  @Test
+  public void shouldReturnLimitedNextWhenChildrenAreLimited() {
+    FruitBuilder builder = QB.builder(FruitBuilder.class).withId(new NonBuilder<String>());
+    assertThat(builder.next().hasSome()).isFalse();
+  }
+  
+  @Test
+  public void shouldReturnNextStateWhenChildrenHaveTransistionableState() {
+    FruitBuilder builder = QB.builder(FruitBuilder.class).withId(ElementSequence.from(Arrays.asList("a","b")));
+    assertThat(builder.build().getId()).isEqualTo("a");
+    assertThat(builder.next().value().build().getId()).isEqualTo("b");
+  }
+  
+  @Test
+  public void shouldReturnNoneWhenTransistionsExhausted() {
+    FruitBuilder builder = QB.builder(FruitBuilder.class).withId(ElementSequence.from(Arrays.asList("a","b")));
+    Maybe<Builder<FruitBean>> oneTransistion = builder.next();
+    Maybe<Builder<FruitBean>> twoTransistions =  oneTransistion.value().next();
+    assertThat(twoTransistions.hasSome()).isEqualTo(false);
+  }
 }

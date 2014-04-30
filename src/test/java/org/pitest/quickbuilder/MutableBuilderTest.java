@@ -38,11 +38,4 @@ public class MutableBuilderTest {
     assertThat(builder.withFoo("foo")._Foo()).isEqualTo("foo");
   }
 
-  @Test
-  public void shouldSupportSequencesOfValues() {
-    final MutableFruitBuilder builder = QB.builder(MutableFruitBuilder.class)
-        .withId(ElementSequence.from(Arrays.asList("a", "b")));
-    assertThat(builder.build().getId()).isEqualTo("a");
-    assertThat(builder.build().getId()).isEqualTo("b");
-  }
 }
