@@ -368,6 +368,8 @@ public class ImmutableBuilderTest {
       QB.builder(BuilderWithTypeMismatchInUnderscoreMethod.class);
     } catch (final QuickBuilderError e) {
       assertThat(e).hasMessageContaining("No setter found for Foo of type");
+      assertThat(e).hasMessageContaining(BuilderWithTypeMismatchInUnderscoreMethod.class.getName());
+      assertThat(e).hasMessageContaining(String.class.getName());
     }
   }
 

@@ -89,7 +89,7 @@ public class TypeScanner<T, B extends Builder<T>> {
     final List<Property> ps = findDeclaredProperties(builtType);
     final Set<Property> userProperties = findUserHandledProperties(builtType);
 
-    checkProperties(ps, userProperties);
+    checkProperties(ps, userProperties, builtType);
 
     final BuilderBuilder bb = new BuilderBuilder(builderName, proxiedName,
         builtTypeName, ps);
@@ -98,17 +98,19 @@ public class TypeScanner<T, B extends Builder<T>> {
   }
 
   private void checkProperties(final List<Property> ps,
-      final Set<Property> userProperties) {
+      final Set<Property> userProperties, Class<T> builtType) {
     for (final Property each : ps) {
       if (userProperties.contains(each)) {
         each.disableSetter();
       } else {
         if (!each.isHasSetter()) {
           throw new QuickBuilderError(
-              "No setter found for "
+              "Can't create builder from " + this.builder.getName() + " : "
+                  + "No setter found for "
                   + each.name()
                   + " of type "
                   + each.type()
+                  + " on the built class " + builtType.getName()
                   + ".\nCheck name and type or declare an underscore method and generator to handle it yourself.");
         }
       }
