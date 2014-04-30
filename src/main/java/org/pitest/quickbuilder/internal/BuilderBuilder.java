@@ -20,6 +20,7 @@ import static org.objectweb.asm.Opcodes.ICONST_1;
 import static org.objectweb.asm.Opcodes.IFEQ;
 import static org.objectweb.asm.Opcodes.IFNONNULL;
 import static org.objectweb.asm.Opcodes.IFNULL;
+import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
@@ -42,6 +43,7 @@ import org.objectweb.asm.Type;
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.Generator;
 import org.pitest.quickbuilder.sequence.ConstantBuilder;
+import org.pitest.quickbuilder.sequence.SequenceBuilder;
 
 class BuilderBuilder {
 
@@ -52,6 +54,10 @@ class BuilderBuilder {
                                                          .fromClass(Builder.class);
   private static final TypeName GENERATOR            = TypeName
                                                          .fromClass(Generator.class);
+  
+  private static final TypeName SequenceBuilder            = TypeName
+      .fromClass(SequenceBuilder.class);
+
 
   private final String          builderName;
   private final String          proxiedName;
@@ -74,7 +80,7 @@ class BuilderBuilder {
     cw.visit(Opcodes.V1_5, ACC_PUBLIC + ACC_SUPER, this.builderName,
         "Ljava/lang/Object;L" + BUILDER_INTERFACE.name() + "<L" + this.built
             + ";>;" + "L" + this.proxiedName + ";", "java/lang/Object",
-        new String[] { BUILDER_INTERFACE.name(), this.proxiedName });
+        new String[] { BUILDER_INTERFACE.name(), SequenceBuilder.name(),this.proxiedName });
 
     createFields(cw);
 
@@ -90,6 +96,7 @@ class BuilderBuilder {
 
     createHasNextMethod(cw);
     createNextMethod(cw);
+    createSequenceBuildMethod(cw);
 
     cw.visitEnd();
 
@@ -610,6 +617,17 @@ class BuilderBuilder {
     mv.visitMaxs(1, 1);
     mv.visitEnd();
 
+  }
+  
+  private void createSequenceBuildMethod(ClassWriter cw) {
+    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "build", "(I)Ljava/util/List;", "(I)Ljava/util/List<L" + this.built + ";>;", null);
+      mv.visitCode();
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitVarInsn(ILOAD, 1);
+      mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/sequence/Sequences", "build", "(Lorg/pitest/quickbuilder/Builder;I)Ljava/util/List;", false);
+      mv.visitInsn(ARETURN);
+      mv.visitMaxs(2, 2);
+      mv.visitEnd();  
   }
 
 }

@@ -1,7 +1,10 @@
-package org.pitest.quickbuilder;
+package org.pitest.quickbuilder.sequence;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.pitest.quickbuilder.Builder;
+import org.pitest.quickbuilder.Maybe;
 
 public class Sequences {
 

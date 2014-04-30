@@ -1,8 +1,9 @@
 package com.example.beans;
 
 import org.pitest.quickbuilder.Builder;
+import org.pitest.quickbuilder.sequence.SequenceBuilder;
 
-public interface FruitBuilder extends Builder<FruitBean> {
+public interface FruitBuilder extends SequenceBuilder<FruitBean> {
 
   FruitBuilder withName(String name);
 
