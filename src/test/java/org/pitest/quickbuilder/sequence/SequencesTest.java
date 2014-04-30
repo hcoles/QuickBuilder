@@ -39,7 +39,14 @@ public class SequencesTest {
     assertThat(expected.size()).isEqualTo(2);
   }
   
-
+  @Test
+  public void shouldConsumeAllOfSmallestSequencesWhenBuidAllCalledViaInstanceMethod() {
+    final FruitBuilder builder = QB.builder(FruitBuilder.class).withId(
+        ElementSequence.from(Arrays.asList("one", "two")));
+    final List<FruitBean> actual = builder.buildAll();
+    assertThat(actual).hasSize(2);
+  }
+  
   private Condition<FruitBean> fruitWithId(final String id) {
     return new Condition<FruitBean>() {
       @Override

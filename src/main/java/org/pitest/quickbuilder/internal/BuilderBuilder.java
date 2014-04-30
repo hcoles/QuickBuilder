@@ -97,6 +97,7 @@ class BuilderBuilder {
     createHasNextMethod(cw);
     createNextMethod(cw);
     createSequenceBuildMethod(cw);
+    createBuildAllMethod(cw);
 
     cw.visitEnd();
 
@@ -625,6 +626,16 @@ class BuilderBuilder {
       mv.visitVarInsn(ALOAD, 0);
       mv.visitVarInsn(ILOAD, 1);
       mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/sequence/Sequences", "build", "(Lorg/pitest/quickbuilder/Builder;I)Ljava/util/List;", false);
+      mv.visitInsn(ARETURN);
+      mv.visitMaxs(2, 2);
+      mv.visitEnd();  
+  }
+  
+  private void createBuildAllMethod(ClassWriter cw) {
+    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "buildAll", "()Ljava/util/List;", "()Ljava/util/List<L" + this.built + ";>;", null);
+      mv.visitCode();
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/sequence/Sequences", "buildAll", "(Lorg/pitest/quickbuilder/Builder;)Ljava/util/List;", false);
       mv.visitInsn(ARETURN);
       mv.visitMaxs(2, 2);
       mv.visitEnd();  

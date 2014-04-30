@@ -15,6 +15,7 @@ import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.Generator;
 import org.pitest.quickbuilder.QB;
 import org.pitest.quickbuilder.QuickBuilderError;
+import org.pitest.quickbuilder.sequence.SequenceBuilder;
 
 import com.googlecode.gentyref.GenericTypeReflector;
 
@@ -185,7 +186,7 @@ public class TypeScanner<T, B extends Builder<T>> {
   private boolean isPropertyMethod(final Method m) {
     final String name = m.getName();
     return (!name.startsWith(USER_PROPERTY_PREFIX)
-        && !m.getDeclaringClass().equals(Builder.class) && (StringUtils
+        && !m.getDeclaringClass().equals(Builder.class) && !m.getDeclaringClass().equals(SequenceBuilder.class) && (StringUtils
         .parseCamelCase(name).length > 1));
   }
 

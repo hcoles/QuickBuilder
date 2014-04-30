@@ -4,6 +4,12 @@ import java.util.List;
 
 import org.pitest.quickbuilder.Builder;
 
+/**
+ * A Builder that provides convenience methods for creating
+ * sequences of values
+ *
+ * @param <T> The type to build
+ */
 public interface SequenceBuilder<T> extends Builder<T> {
 
   /**
@@ -18,4 +24,18 @@ public interface SequenceBuilder<T> extends Builder<T> {
    */
   List<T> build(int number);
     
+  /**
+   * Builds a list with the maximum possible number of entries.
+   * 
+   * WARNING. If called on a builder that is composed of only constants
+   * then this method will not terminate as the list will be of inifnite
+   * size.
+   * 
+   * The size of the list is limited by the sizes of the shortest
+   * sequence within the builder graph.
+   * 
+   * 
+   * @return A List of Ts.
+   */
+  List<T> buildAll();
 }
