@@ -13,6 +13,7 @@ import java.util.Set;
 import org.objectweb.asm.Type;
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.Generator;
+import org.pitest.quickbuilder.Maybe;
 import org.pitest.quickbuilder.QB;
 import org.pitest.quickbuilder.QuickBuilderError;
 import org.pitest.quickbuilder.sequence.SequenceBuilder;
@@ -89,7 +90,7 @@ public class TypeScanner<T, B extends Builder<T>> {
     final List<Property> ps = findDeclaredProperties(builtType);
     final Set<Property> userProperties = findUserHandledProperties(builtType);
 
-    checkProperties(ps, userProperties, builtType);
+    disableSettersForUserHandledProperties(ps, userProperties, builtType);
 
     final BuilderBuilder bb = new BuilderBuilder(builderName, proxiedName,
         builtTypeName, ps);
@@ -97,7 +98,7 @@ public class TypeScanner<T, B extends Builder<T>> {
     return (Class<B>) cl.createClass(bb.build(), builderName.replace('/', '.'));
   }
 
-  private void checkProperties(final List<Property> ps,
+  private void disableSettersForUserHandledProperties(final List<Property> ps,
       final Set<Property> userProperties, Class<T> builtType) {
     for (final Property each : ps) {
       if (userProperties.contains(each)) {
@@ -210,26 +211,37 @@ public class TypeScanner<T, B extends Builder<T>> {
     if (t.equals(Builder.class)) {
       final java.lang.reflect.ParameterizedType ty = (ParameterizedType) m
           .getGenericParameterTypes()[0];
-      final java.lang.reflect.Type typeArgument = ty.getActualTypeArguments()[0];
-
-      if (typeArgument instanceof Class<?>) {
-        t = (Class<?>) typeArgument;
-      } else {
-        throw new QuickBuilderError("Unable to determine property type for  "
-            + m.getName() + " as wildcards not currently supported");
-      }
-
+      t = findPropertyTypeFromGenericInterface(ty, m);
     } else if (Builder.class.isAssignableFrom(t)) {
-      t = (Class<?>) GenericTypeReflector.getTypeParameter(paramType,
-          Builder.class.getTypeParameters()[0]);
-      if (t == null) {
-        throw new QuickBuilderError("Could not determine property type for "
-            + m.getName());
-      }
+      t = findPropertyTypeFromConcreteBuilder(m, paramType);
     }
 
     return Type.getType(t);
   }
+
+  private Class<?> findPropertyTypeFromConcreteBuilder(final Method m,
+      final Class<?> paramType) {
+    Class<?> t;
+    t = (Class<?>) GenericTypeReflector.getTypeParameter(paramType,
+        Builder.class.getTypeParameters()[0]);
+    if (t == null) {
+      throw new QuickBuilderError("Could not determine property type for "
+          + m.getName());
+    }
+    return t;
+  }
+
+  private Class<?> findPropertyTypeFromGenericInterface(ParameterizedType ty, final Method m) {
+    final java.lang.reflect.Type typeArgument = ty.getActualTypeArguments()[0];
+    if (typeArgument instanceof Class<?>) {
+      return(Class<?>) typeArgument;
+    } else {
+      throw new QuickBuilderError("Unable to determine property type for  "
+          + m.getName() + " as wildcards not currently supported");
+    }
+  }
+  
+  
 
   private Class<?> findDeclaredType(final Method m) {
     final Class<?> t = m.getParameterTypes()[0];
@@ -241,14 +253,28 @@ public class TypeScanner<T, B extends Builder<T>> {
     for (final Method m : this.builder.getMethods()) {
       if (m.getName().startsWith(USER_PROPERTY_PREFIX)) {
         checkUnderScoreMethod(m);
-        final String n = extractName(USER_PROPERTY_PREFIX, m);
-        final org.objectweb.asm.Type type = org.objectweb.asm.Type
-            .getReturnType(m);
-        ps.add(new Property(n, null, USER_PROPERTY_PREFIX, type, type, null,
+        final String n = extractName(findPrefix(m.getName()), m);
+        final org.objectweb.asm.Type type = findType(m);
+        ps.add(new Property(n, null, findPrefix(m.getName()), type, type, null,
             findSetter(builtType, n, type)));
       }
     }
     return ps;
+  }
+
+  private String findPrefix(String name) {
+    if (name.startsWith("__")) {
+      return "__";
+    }
+    return USER_PROPERTY_PREFIX;
+  }
+
+  private Type findType(Method m) {
+    if (m.getReturnType().equals(Maybe.class)) {
+      final java.lang.reflect.ParameterizedType ty = (ParameterizedType) m.getGenericReturnType();
+      return  org.objectweb.asm.Type.getType(findPropertyTypeFromGenericInterface(ty, m));
+    }
+    return org.objectweb.asm.Type.getReturnType(m);
   }
 
   private void checkUnderScoreMethod(final Method m) {

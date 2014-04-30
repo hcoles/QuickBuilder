@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.pitest.quickbuilder.sequence.ConstantBuilder;
 import org.pitest.quickbuilder.sequence.ElementSequence;
@@ -522,7 +521,6 @@ public class ImmutableBuilderTest {
   }
   
   @Test
-  @Ignore
   public void shouldDisableSettersForMaybeMethodForBuilderOnlyProperty() {
     ABeanBuilderWithMaybeUnderScore builder = QB.builder(ABeanBuilderWithMaybeUnderScore.class).withFoo(new ConstantBuilder<String>("foo"));
     assertThat(builder.build().getFoo()).isNull();
