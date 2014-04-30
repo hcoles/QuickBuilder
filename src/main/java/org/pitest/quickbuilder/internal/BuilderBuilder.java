@@ -47,7 +47,7 @@ import org.pitest.quickbuilder.sequence.SequenceBuilder;
 
 class BuilderBuilder {
 
-  private static final TypeName STORED_VALUE_BUILDER = TypeName
+  private static final TypeName CONSTANT_BUILDER = TypeName
                                                          .fromClass(ConstantBuilder.class);
   private static final String   GENERATOR_FIELD      = "___generator";
   private static final TypeName BUILDER_INTERFACE    = TypeName
@@ -431,13 +431,13 @@ class BuilderBuilder {
   }
 
   private void wrapInBuilderObject(final Property prop, final MethodVisitor mv) {
-    mv.visitTypeInsn(NEW, STORED_VALUE_BUILDER.name());
+    mv.visitTypeInsn(NEW, CONSTANT_BUILDER.name());
     mv.visitInsn(DUP);
     mv.visitVarInsn(prop.loadIns(), 1);
 
     convertPrimitiveToWrappingObject(prop, mv);
 
-    mv.visitMethodInsn(INVOKESPECIAL, STORED_VALUE_BUILDER.name(), "<init>",
+    mv.visitMethodInsn(INVOKESPECIAL, CONSTANT_BUILDER.name(), "<init>",
         "(Ljava/lang/Object;)V", false);
   }
 

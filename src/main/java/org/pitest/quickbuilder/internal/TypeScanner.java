@@ -156,8 +156,6 @@ public class TypeScanner<T, B extends Builder<T>> {
       if (isPropertyMethod(m)) {
         checkWithMethod(m);
 
-        findBridgeMethodReturnTypeIfAny(m);
-
         final String prefix = extractPrefix(m.getName());
         final String name = extractName(prefix, m);
         final String owner = m.getDeclaringClass().getName().replace(".", "/");

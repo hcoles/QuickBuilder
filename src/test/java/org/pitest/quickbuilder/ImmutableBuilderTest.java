@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
+import org.pitest.quickbuilder.sequence.ConstantBuilder;
 import org.pitest.quickbuilder.sequence.ElementSequence;
 import org.pitest.quickbuilder.sequence.NonBuilder;
 
@@ -471,5 +472,28 @@ public class ImmutableBuilderTest {
     final Maybe<Builder<FruitBean>> twoTransistions = oneTransistion.value()
         .next();
     assertThat(twoTransistions.hasSome()).isEqualTo(false);
+  }
+  
+  public static class ABean {
+    private String foo;
+
+    public String getFoo() {
+      return foo;
+    }
+
+    public void setFoo(String foo) {
+      this.foo = foo;
+    }
+    
+  }
+  
+  public interface ABeanBuilder extends Builder<ABean> {
+    ABeanBuilder withFoo(Builder<String> b);
+  }
+  
+  @Test
+  public void shouldDetectPropertiesWhenOnlyBuilderWithMethodDeclared() {
+    ABeanBuilder builder = QB.builder(ABeanBuilder.class).withFoo(new ConstantBuilder<String>("foo"));
+    assertThat(builder.build().getFoo()).isEqualTo("foo");
   }
 }
