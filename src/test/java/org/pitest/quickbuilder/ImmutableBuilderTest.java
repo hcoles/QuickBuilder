@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.pitest.quickbuilder.sequence.ConstantBuilder;
 import org.pitest.quickbuilder.sequence.ElementSequence;
@@ -495,5 +496,35 @@ public class ImmutableBuilderTest {
   public void shouldDetectPropertiesWhenOnlyBuilderWithMethodDeclared() {
     ABeanBuilder builder = QB.builder(ABeanBuilder.class).withFoo(new ConstantBuilder<String>("foo"));
     assertThat(builder.build().getFoo()).isEqualTo("foo");
+  }
+  
+  public interface ABeanBuilderWithUnderScore extends Builder<ABean> {
+    ABeanBuilderWithUnderScore withFoo(Builder<String> b);
+    String _Foo();
+  }
+  
+  @Test
+  public void shouldImplementUnderscoreMethodDeclaredForBuildeOnlyProperty() {
+    ABeanBuilderWithUnderScore builder = QB.builder(ABeanBuilderWithUnderScore.class).withFoo(new ConstantBuilder<String>("foo"));
+    assertThat(builder._Foo()).isEqualTo("foo");
+    assertThat(builder.build().getFoo()).isNull();
+  }
+  
+  public interface ABeanBuilderWithMaybeUnderScore extends Builder<ABean> {
+    ABeanBuilderWithMaybeUnderScore withFoo(Builder<String> b);
+    Maybe<String> __Foo();
+  }
+  
+  @Test
+  public void shouldImplementMaybeUnderscoreMethodDeclaredForBuilderOnlyProperty() {
+    ABeanBuilderWithMaybeUnderScore builder = QB.builder(ABeanBuilderWithMaybeUnderScore.class).withFoo(new ConstantBuilder<String>("foo"));
+    assertThat(builder.__Foo().value()).isEqualTo("foo");
+  }
+  
+  @Test
+  @Ignore
+  public void shouldDisableSettersForMaybeMethodForBuilderOnlyProperty() {
+    ABeanBuilderWithMaybeUnderScore builder = QB.builder(ABeanBuilderWithMaybeUnderScore.class).withFoo(new ConstantBuilder<String>("foo"));
+    assertThat(builder.build().getFoo()).isNull();
   }
 }

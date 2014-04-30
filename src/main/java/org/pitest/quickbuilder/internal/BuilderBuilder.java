@@ -174,12 +174,14 @@ class BuilderBuilder {
   }
 
   private void createPropertyMethods(final ClassWriter cw) {
+
     for (final Property each : this.ps) {
       createWithMethod(cw, each);
-      if (!each.isBuilder()) {
-        createAccessor(cw, each);
-        createMaybeProperty(cw, each);
-      }
+    }
+
+    for (final Property each : this.uniqueProperties()) {
+      createAccessor(cw, each);
+      createMaybeProperty(cw, each);
     }
   }
 
