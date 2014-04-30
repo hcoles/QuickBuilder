@@ -57,15 +57,14 @@ class BuilderBuilder {
   private final String          proxiedName;
   private final String          built;
   private final List<Property>  ps;
-  private final boolean         mutable;
+
 
   BuilderBuilder(final String builderName, final String proxiedName,
-      final String built, final boolean isMutable, final List<Property> ps) {
+      final String built, final List<Property> ps) {
     this.builderName = builderName;
     this.proxiedName = proxiedName;
     this.built = built;
     this.ps = ps;
-    this.mutable = isMutable;
   }
 
   public byte[] build() throws Exception {
@@ -82,11 +81,6 @@ class BuilderBuilder {
     createInitMethod(cw);
     if (!this.uniqueProperties().isEmpty()) {
       createCopyConstructor(cw);
-    }
-
-    if (this.mutable) {
-      createButMethod(cw);
-      createBridgeForButMethod(cw);
     }
 
     createPropertyMethods(cw);
@@ -182,31 +176,6 @@ class BuilderBuilder {
     }
   }
 
-  private void createButMethod(final ClassWriter cw) {
-    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "but", "()L"
-        + this.builderName + ";", null, null);
-
-    mv.visitCode();
-    mv.visitTypeInsn(NEW, this.builderName);
-    mv.visitInsn(DUP);
-    mv.visitVarInsn(ALOAD, 0);
-    mv.visitFieldInsn(GETFIELD, this.builderName, GENERATOR_FIELD,
-        GENERATOR.type());
-
-    for (final Property each : this.uniqueProperties()) {
-      mv.visitVarInsn(ALOAD, 0);
-      mv.visitFieldInsn(GETFIELD, this.builderName, each.name(),
-          "Lorg/pitest/quickbuilder/Builder;");
-    }
-
-    mv.visitMethodInsn(INVOKESPECIAL, this.builderName, "<init>",
-        this.initDescriptor(), false);
-    mv.visitInsn(ARETURN);
-
-    mv.visitMaxs(1, 1);
-    mv.visitEnd();
-
-  }
 
   private void createCopyConstructor(final ClassWriter cw) {
 
@@ -389,9 +358,6 @@ class BuilderBuilder {
   }
 
   private int fieldFlags() {
-    if (this.mutable) {
-      return ACC_PRIVATE;
-    }
     return ACC_PRIVATE + ACC_FINAL;
   }
 
@@ -401,11 +367,7 @@ class BuilderBuilder {
   }
 
   private void createWithMethod(final ClassWriter cw, final Property prop) {
-    if (this.mutable) {
-      createMutableWithMethod(cw, prop);
-    } else {
-      createImmutableWithMethod(cw, prop);
-    }
+    createImmutableWithMethod(cw, prop);
 
     if (prop.needsBridge()) {
       createBridge(prop, cw);
@@ -426,27 +388,6 @@ class BuilderBuilder {
     mv.visitMaxs(3, 3);
     mv.visitEnd();
 
-  }
-
-  private void createMutableWithMethod(final ClassWriter cw, final Property prop) {
-    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, prop.withMethodName(),
-        "(" + prop.declaredType() + ")L" + prop.owner() + ";", null, null);
-
-    mv.visitCode();
-    mv.visitVarInsn(ALOAD, 0);
-    if (!prop.isBuilder()) {
-      wrapInBuilderObject(prop, mv);
-    } else {
-      mv.visitVarInsn(ALOAD, 1);
-    }
-    mv.visitFieldInsn(PUTFIELD, this.builderName, prop.name(),
-        "Lorg/pitest/quickbuilder/Builder;");
-
-    mv.visitVarInsn(ALOAD, 0);
-    mv.visitInsn(ARETURN);
-
-    mv.visitMaxs(1, 1);
-    mv.visitEnd();
   }
 
   private void createImmutableWithMethod(final ClassWriter cw,
@@ -597,19 +538,6 @@ class BuilderBuilder {
     mv.visitVarInsn(ALOAD, 0);
     mv.visitMethodInsn(INVOKEVIRTUAL, this.builderName, "build", "()L"
         + this.built + ";", false);
-    mv.visitInsn(ARETURN);
-    mv.visitMaxs(1, 1);
-    mv.visitEnd();
-  }
-
-  private void createBridgeForButMethod(final ClassWriter cw) {
-    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC + ACC_BRIDGE
-        + ACC_SYNTHETIC, "but", "()Lorg/pitest/quickbuilder/MutableBuilder;",
-        null, null);
-    mv.visitCode();
-    mv.visitVarInsn(ALOAD, 0);
-    mv.visitMethodInsn(INVOKEVIRTUAL, this.builderName, "but", "()L"
-        + this.builderName + ";", false);
     mv.visitInsn(ARETURN);
     mv.visitMaxs(1, 1);
     mv.visitEnd();

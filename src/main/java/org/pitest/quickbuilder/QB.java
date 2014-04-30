@@ -53,13 +53,8 @@ public abstract class QB {
   @SuppressWarnings("unchecked")
   public static <T, B extends Builder<T>> B builder(final Class<B> builder,
       final Generator<B, T> seed) {
-    final TypeScanner<T, B> ts = new TypeScanner<T, B>(builder, seed,
-        isMutable(builder));
+    final TypeScanner<T, B> ts = new TypeScanner<T, B>(builder, seed);
     return ts.builder();
-  }
-
-  private static boolean isMutable(final Class<?> c) {
-    return MutableBuilder.class.isAssignableFrom(c);
   }
 
 }

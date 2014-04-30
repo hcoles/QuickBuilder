@@ -28,13 +28,10 @@ public class TypeScanner<T, B extends Builder<T>> {
 
   private final Class<B>        builder;
   private final Generator<B, T> g;
-  private final boolean         isMutable;
 
-  public TypeScanner(final Class<B> builder, final Generator<B, T> g,
-      final boolean isMutable) {
+  public TypeScanner(final Class<B> builder, final Generator<B, T> g) {
     this.builder = builder;
     this.g = g;
-    this.isMutable = isMutable;
   }
 
   @SuppressWarnings("unchecked")
@@ -94,7 +91,7 @@ public class TypeScanner<T, B extends Builder<T>> {
     checkProperties(ps, userProperties);
 
     final BuilderBuilder bb = new BuilderBuilder(builderName, proxiedName,
-        builtTypeName, this.isMutable, ps);
+        builtTypeName, ps);
 
     return (Class<B>) cl.createClass(bb.build(), builderName.replace('/', '.'));
   }

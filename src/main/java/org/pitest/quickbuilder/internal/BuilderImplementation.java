@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.pitest.quickbuilder.Builder;
-import org.pitest.quickbuilder.MutableBuilder;
 import org.pitest.quickbuilder.sequence.ConstantBuilder;
 
 public class BuilderImplementation {
@@ -21,11 +20,6 @@ public class BuilderImplementation {
     if (b == null) {
       return null;
     }
-
-    if (b instanceof MutableBuilder) {
-      return ((MutableBuilder<?>) b).but();
-    }
-
     return b;
   }
 
