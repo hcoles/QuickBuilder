@@ -1,15 +1,14 @@
 package com.example.beans.primitives;
 
 public class DoubleBean {
-   private double d;
+  private double d;
 
   public double getD() {
-    return d;
+    return this.d;
   }
 
-  public void setD(double d) {
+  public void setD(final double d) {
     this.d = d;
   }
-   
-   
+
 }

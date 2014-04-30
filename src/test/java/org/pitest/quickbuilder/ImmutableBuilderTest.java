@@ -53,7 +53,6 @@ import com.example.beans.primitives.PrimitiveBeanBuilder;
 import com.example.beans.primitives.ShortBean;
 import com.example.beans.primitives.ShortBeanBuilder;
 import com.example.example.Apple;
-import com.example.example.Fruit;
 import com.example.example.FruitBuilders;
 import com.example.immutable.IntegerValue;
 import com.example.immutable.IntegerValueBuilder;
@@ -62,7 +61,7 @@ import com.example.immutable.MixedValueBuilder;
 import com.example.immutable.MixedValueGenerator;
 
 public class ImmutableBuilderTest {
-  
+
   @Test
   public void shouldCreateABuilder() {
     final StatelessBeanBuilder testee = QB.builder(StatelessBeanBuilder.class);
@@ -208,7 +207,7 @@ public class ImmutableBuilderTest {
   @Test
   public void shouldUseCorrectMethodsInHierarchy() {
     final ChildBeanBuilder builder = QB.builder(ChildBeanBuilder.class);
-    ChildBean bean = builder.withFoo("foo").withBar("bar").build();
+    final ChildBean bean = builder.withFoo("foo").withBar("bar").build();
     assertThat(bean.getBar()).isEqualTo("bar");
     assertThat(bean.getFoo()).isEqualTo("modifiedbychild_foo");
 
@@ -245,50 +244,49 @@ public class ImmutableBuilderTest {
         intGenerator());
     assertThat(builder.withI(42).build().i()).isEqualTo(42);
   }
-  
+
   public interface MaybeStringBeanBuilder extends Builder<StringBean> {
-    
+
     MaybeStringBeanBuilder withName(String name);
-    
+
     Maybe<String> __Name();
-    
+
   }
-  
+
   @Test
   public void shouldImplementUnderscoreAccessorsForMaybes() {
-    MaybeStringBeanBuilder builder = QB.builder(MaybeStringBeanBuilder.class);
+    final MaybeStringBeanBuilder builder = QB
+        .builder(MaybeStringBeanBuilder.class);
     assertThat(builder.__Name().hasNone()).isTrue();
     assertThat(builder.withName("foo").__Name().value()).isEqualTo("foo");
   }
 
-  
   @Test
   public void shouldImplementUnderscoreAccessorsForPrimitiveMaybes() {
-    PrimitiveBeanBuilder builder = QB.builder(PrimitiveBeanBuilder.class);
+    final PrimitiveBeanBuilder builder = QB.builder(PrimitiveBeanBuilder.class);
     assertThat(builder.__I().hasNone()).isTrue();
     assertThat(builder.__D().hasNone()).isTrue();
     assertThat(builder.withI(42).__I().value()).isEqualTo(42);
     assertThat(builder.withD(1).__D().value()).isEqualTo(1);
   }
 
-  
   @Test
   public void shouldConstructImmutableMixedValueTypes() {
     final MixedValueBuilder builder = QB.builder(MixedValueBuilder.class,
         new MixedValueGenerator());
-    double[] ds = new double[] { 1.0d, 2.2d };
-    float f = 1.3f;
+    final double[] ds = new double[] { 1.0d, 2.2d };
+    final float f = 1.3f;
 
-    MixedValue actual = builder.withDs(ds).withF(f).withS("S").withSs("SS")
-        .withLs(null).build();
+    final MixedValue actual = builder.withDs(ds).withF(f).withS("S")
+        .withSs("SS").withLs(null).build();
     assertThat(actual.getDs()).isSameAs(ds);
     assertThat(actual.getF()).isEqualTo(f);
     assertThat(actual.getS()).isEqualTo("S");
     assertThat(actual.getSs()).isEqualTo("SS");
   }
 
-  private Generator<IntegerValueBuilder,IntegerValue> intGenerator() {
-    return new Generator<IntegerValueBuilder,IntegerValue>() {
+  private Generator<IntegerValueBuilder, IntegerValue> intGenerator() {
+    return new Generator<IntegerValueBuilder, IntegerValue>() {
       @Override
       public IntegerValue generate(final IntegerValueBuilder builder) {
         return new IntegerValue(builder._I());
@@ -306,7 +304,7 @@ public class ImmutableBuilderTest {
     try {
       QB.builder(PropertyOverridenByUnderscore.class);
       // pass
-    } catch (Exception ex) {
+    } catch (final Exception ex) {
       fail(ex.getMessage());
     }
 
@@ -314,44 +312,43 @@ public class ImmutableBuilderTest {
 
   @Test
   public void shouldAcceptBuilderInPlaceOfPropertyType() {
-    CompositeBeanBuilder builder = QB.builder(CompositeBeanBuilder.class);
-    FruitBuilder fb = QB.builder(FruitBuilder.class).withName("foo");
-    CompositeBean actual = builder.withFruit(fb).build();
+    final CompositeBeanBuilder builder = QB.builder(CompositeBeanBuilder.class);
+    final FruitBuilder fb = QB.builder(FruitBuilder.class).withName("foo");
+    final CompositeBean actual = builder.withFruit(fb).build();
     assertThat(actual.getFruit().getName()).isEqualTo("foo");
   }
 
   @Test
   public void shouldAllowPropertyToBeOverriddenByBuilderAndType() {
-    CompositeBeanBuilder builder = QB.builder(CompositeBeanBuilder.class);
-    FruitBuilder fb = QB.builder(FruitBuilder.class).withName("foo");
-    CompositeBean actual = builder.withFruit(fb).withFruit(new FruitBean())
-        .build();
+    final CompositeBeanBuilder builder = QB.builder(CompositeBeanBuilder.class);
+    final FruitBuilder fb = QB.builder(FruitBuilder.class).withName("foo");
+    final CompositeBean actual = builder.withFruit(fb)
+        .withFruit(new FruitBean()).build();
     // last call should take precedence
     assertThat(actual.getFruit().getName()).isNull();
   }
 
   @Test
   public void shouldAcceptBaseBuilderInterfaceInPlaceOfBuiltType() {
-    BuilderDeclaringBaseBuilderProperty builder = QB
+    final BuilderDeclaringBaseBuilderProperty builder = QB
         .builder(BuilderDeclaringBaseBuilderProperty.class);
-    FruitBuilder fb = QB.builder(FruitBuilder.class).withName("foo");
-    CompositeBean bean = builder.withMoreFruit(fb).build();
+    final FruitBuilder fb = QB.builder(FruitBuilder.class).withName("foo");
+    final CompositeBean bean = builder.withMoreFruit(fb).build();
     assertThat(bean.getMoreFruit().getName()).isEqualTo("foo");
   }
-  
-  
-  
+
   @Test
   public void shouldCreateBridgeMethodsForErasedReturnTypes() {
-    Apple a = FruitBuilders.anApple().withRipeness(2d).withLeaves(2).build();
-    assertEquals(a.numberOfLeaves(),2);
+    final Apple a = FruitBuilders.anApple().withRipeness(2d).withLeaves(2)
+        .build();
+    assertEquals(a.numberOfLeaves(), 2);
   }
 
   @Test
   public void doesNotSupportWildCards() {
     try {
       QB.builder(BuilderDeclaringBoundedWildcardProperty.class);
-    } catch (QuickBuilderError e) {
+    } catch (final QuickBuilderError e) {
       assertThat(e).hasMessageContaining("wildcards not currently supported");
     }
   }
@@ -360,7 +357,7 @@ public class ImmutableBuilderTest {
   public void shouldThrowErrorWhenUnderScoreMethodHasParameter() {
     try {
       QB.builder(BuilderWithParameterisedUnderscoreMethod.class);
-    } catch (QuickBuilderError e) {
+    } catch (final QuickBuilderError e) {
       assertThat(e).hasMessageContaining("_Foo should not have parameters");
     }
   }
@@ -369,7 +366,7 @@ public class ImmutableBuilderTest {
   public void shouldThrowErrorWhenTypeOfUnderscoreMethodDoesNotMatchProperty() {
     try {
       QB.builder(BuilderWithTypeMismatchInUnderscoreMethod.class);
-    } catch (QuickBuilderError e) {
+    } catch (final QuickBuilderError e) {
       assertThat(e).hasMessageContaining("No setter found for Foo of type");
     }
   }
@@ -378,7 +375,7 @@ public class ImmutableBuilderTest {
   public void shouldThrowErrorWhenWithMethodDoesNotReturnBuilder() {
     try {
       QB.builder(BuilderWithPropertyReturningWrongType.class);
-    } catch (QuickBuilderError e) {
+    } catch (final QuickBuilderError e) {
       assertThat(e).hasMessageContaining(
           "should declare return type as "
               + BuilderWithPropertyReturningWrongType.class.getName());
@@ -389,7 +386,7 @@ public class ImmutableBuilderTest {
   public void shouldThrowErrorWhenWithMethodHasWrongNumberOfParameters() {
     try {
       QB.builder(BuilderWithPropertyWithTooManyParameters.class);
-    } catch (QuickBuilderError e) {
+    } catch (final QuickBuilderError e) {
       assertThat(e).hasMessageContaining("should take exactly one parameter");
     }
   }
@@ -400,7 +397,7 @@ public class ImmutableBuilderTest {
         new MixedValueGenerator());
     try {
       builder.withF(1.0f).build();
-    } catch (NoValueAvailableError e) {
+    } catch (final NoValueAvailableError e) {
       assertThat(e).hasMessageContaining("no value");
     }
     // fail
@@ -415,60 +412,62 @@ public class ImmutableBuilderTest {
     try {
       QB.builder(InvalidClass.class);
       fail("expected an exception");
-    } catch (QuickBuilderError e) {
+    } catch (final QuickBuilderError e) {
       assertThat(e).hasMessageContaining("not an interface");
       assertThat(e).hasMessageContaining(InvalidClass.class.getName());
     }
 
   }
 
-  
   interface Inaccessible extends Builder<String> {
-    
+
   }
-  
+
   @Test
   public void shouldThrowErrorWhenAskedToImplementInaccessibleInterface() {
     try {
       QB.builder(Inaccessible.class);
-    } catch (QuickBuilderError e) {
+    } catch (final QuickBuilderError e) {
       assertThat(e).hasMessageContaining(
           "Cannot implement the interface " + Inaccessible.class.getName());
     }
   }
-  
 
   @Test
   public void shouldReturnConstantNextWhenNoChildrenSet() {
-    FruitBuilder builder = QB.builder(FruitBuilder.class);
+    final FruitBuilder builder = QB.builder(FruitBuilder.class);
     assertThat(builder.next().hasSome()).isTrue();
   }
-  
+
   @Test
   public void shouldReturnConstantNextWhenNoChildrenAreConstants() {
-    FruitBuilder builder = QB.builder(FruitBuilder.class).withId("foo");
+    final FruitBuilder builder = QB.builder(FruitBuilder.class).withId("foo");
     assertThat(builder.next().hasSome()).isTrue();
     assertThat(builder.next().value().build().getId()).isEqualTo("foo");
   }
-    
+
   @Test
   public void shouldReturnLimitedNextWhenChildrenAreLimited() {
-    FruitBuilder builder = QB.builder(FruitBuilder.class).withId(new NonBuilder<String>());
+    final FruitBuilder builder = QB.builder(FruitBuilder.class).withId(
+        new NonBuilder<String>());
     assertThat(builder.next().hasSome()).isFalse();
   }
-  
+
   @Test
   public void shouldReturnNextStateWhenChildrenHaveTransistionableState() {
-    FruitBuilder builder = QB.builder(FruitBuilder.class).withId(ElementSequence.from(Arrays.asList("a","b")));
+    final FruitBuilder builder = QB.builder(FruitBuilder.class).withId(
+        ElementSequence.from(Arrays.asList("a", "b")));
     assertThat(builder.build().getId()).isEqualTo("a");
     assertThat(builder.next().value().build().getId()).isEqualTo("b");
   }
-  
+
   @Test
   public void shouldReturnNoneWhenTransistionsExhausted() {
-    FruitBuilder builder = QB.builder(FruitBuilder.class).withId(ElementSequence.from(Arrays.asList("a","b")));
-    Maybe<Builder<FruitBean>> oneTransistion = builder.next();
-    Maybe<Builder<FruitBean>> twoTransistions =  oneTransistion.value().next();
+    final FruitBuilder builder = QB.builder(FruitBuilder.class).withId(
+        ElementSequence.from(Arrays.asList("a", "b")));
+    final Maybe<Builder<FruitBean>> oneTransistion = builder.next();
+    final Maybe<Builder<FruitBean>> twoTransistions = oneTransistion.value()
+        .next();
     assertThat(twoTransistions.hasSome()).isEqualTo(false);
   }
 }

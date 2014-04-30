@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * Holder for one or no values - the typesafe null pattern.
- * Finally included in Java 8 as optional, but implemented here
- * for use with early jdks.
- *
- * @param <T> Type to hold
+ * Holder for one or no values - the typesafe null pattern. Finally included in
+ * Java 8 as optional, but implemented here for use with early jdks.
+ * 
+ * @param <T>
+ *          Type to hold
  */
 public abstract class Maybe<T> implements Iterable<T>, Serializable {
 
@@ -26,7 +26,6 @@ public abstract class Maybe<T> implements Iterable<T>, Serializable {
   public abstract T getOrElse(T defaultValue);
 
   public abstract boolean hasSome();
-
 
   @SuppressWarnings("unchecked")
   public static <T> Maybe<T> some(final T value) {
@@ -54,6 +53,7 @@ public abstract class Maybe<T> implements Iterable<T>, Serializable {
 
     }
 
+    @Override
     public Iterator<T> iterator() {
       return Collections.<T> emptySet().iterator();
     }
@@ -91,6 +91,7 @@ public abstract class Maybe<T> implements Iterable<T>, Serializable {
       return this.value;
     }
 
+    @Override
     public Iterator<T> iterator() {
       return Collections.singleton(this.value).iterator();
 

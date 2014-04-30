@@ -5,13 +5,11 @@ public class ByteBean {
   private byte by;
 
   public byte getBy() {
-    return by;
+    return this.by;
   }
 
-  public void setBy(byte by) {
+  public void setBy(final byte by) {
     this.by = by;
   }
-  
-  
-  
+
 }

@@ -1,26 +1,26 @@
 package org.pitest.quickbuilder;
 
-public class Transistion <T,U> {
+public class Transistion<T, U> {
 
-  private final T state;
+  private final T        state;
   private final Maybe<U> value;
-  
-  Transistion(T state,  Maybe<U> value) {
+
+  Transistion(final T state, final Maybe<U> value) {
     this.state = state;
     this.value = value;
   }
-  
-  public static <T,U> Transistion <T,U> transistion(T state,  Maybe<U> value) {
-    return new Transistion <T,U>(state, value);
+
+  public static <T, U> Transistion<T, U> transistion(final T state,
+      final Maybe<U> value) {
+    return new Transistion<T, U>(state, value);
   }
-  
-  
+
   T newState() {
-    return state;
+    return this.state;
   }
-  
+
   Maybe<U> value() {
-    return value;
+    return this.value;
   }
-  
+
 }

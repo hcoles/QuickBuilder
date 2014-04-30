@@ -5,12 +5,11 @@ public class IntBean {
   private int i;
 
   public int getI() {
-    return i;
+    return this.i;
   }
 
-  public void setI(int i) {
+  public void setI(final int i) {
     this.i = i;
   }
-  
-  
+
 }

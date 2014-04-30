@@ -20,9 +20,9 @@ public interface PrimitiveBeanBuilder extends Builder<PrimitiveBean> {
   PrimitiveBeanBuilder withB(boolean b);
 
   PrimitiveBeanBuilder withBy(byte by);
-  
+
   Maybe<Integer> __I();
-  
+
   Maybe<Double> __D();
 
 }

@@ -12,5 +12,5 @@ public interface MutableFruitBuilder extends MutableBuilder<FruitBean> {
   MutableFruitBuilder withRipeness(int ripeness);
 
   MutableFruitBuilder withId(Builder<String> id);
-  
+
 }

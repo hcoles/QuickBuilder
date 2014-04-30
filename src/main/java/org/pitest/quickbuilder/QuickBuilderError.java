@@ -4,15 +4,15 @@ public class QuickBuilderError extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  public QuickBuilderError(String message, Exception cause) {
-    super(message,cause);
+  public QuickBuilderError(final String message, final Exception cause) {
+    super(message, cause);
   }
-  
-  public QuickBuilderError(Exception cause) {
+
+  public QuickBuilderError(final Exception cause) {
     super(cause);
   }
-    
-  public QuickBuilderError(String message) {
+
+  public QuickBuilderError(final String message) {
     super(message);
   }
 }

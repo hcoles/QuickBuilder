@@ -5,7 +5,7 @@ import org.pitest.quickbuilder.Maybe;
 import org.pitest.quickbuilder.NoValueAvailableError;
 
 public class NonBuilder<T> implements Builder<T> {
-  
+
   Builder<T> b;
   Builder<T> c;
 
@@ -18,8 +18,5 @@ public class NonBuilder<T> implements Builder<T> {
   public Maybe<Builder<T>> next() {
     return Maybe.none();
   }
-
-
-
 
 }

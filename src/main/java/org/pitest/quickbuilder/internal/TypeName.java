@@ -1,27 +1,27 @@
 package org.pitest.quickbuilder.internal;
 
 class TypeName {
-  
+
   private final String name;
-  
-  static TypeName fromString(String s) {
+
+  static TypeName fromString(final String s) {
     return new TypeName(s);
   }
-  
-  static TypeName fromClass(Class<?> c) {
+
+  static TypeName fromClass(final Class<?> c) {
     return new TypeName(c.getName().replace(".", "/"));
   }
-  
-  TypeName(String name) {
+
+  TypeName(final String name) {
     this.name = name;
   }
-  
+
   String name() {
-    return name;
+    return this.name;
   }
-  
+
   String type() {
-    return "L" + name + ";";
+    return "L" + this.name + ";";
   }
 
 }

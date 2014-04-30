@@ -28,9 +28,10 @@ public class TypeScanner<T, B extends Builder<T>> {
 
   private final Class<B>        builder;
   private final Generator<B, T> g;
-  private final boolean isMutable;
+  private final boolean         isMutable;
 
-  public TypeScanner(final Class<B> builder, final Generator<B,T> g, final boolean isMutable) {
+  public TypeScanner(final Class<B> builder, final Generator<B, T> g,
+      final boolean isMutable) {
     this.builder = builder;
     this.g = g;
     this.isMutable = isMutable;
@@ -40,13 +41,14 @@ public class TypeScanner<T, B extends Builder<T>> {
   public B builder() {
 
     checkSuppliedInterface();
-    
+
     final String proxiedName = this.builder.getName().replace(".", "/");
     final String builderName = proxiedName + "__quickbuilder__";
 
     try {
       final Class<B> builderClass = findOrMakeBuilder(proxiedName, builderName);
-      Constructor<B> c = builderClass.getDeclaredConstructor(Generator.class);
+      final Constructor<B> c = builderClass
+          .getDeclaredConstructor(Generator.class);
       final B b = c.newInstance(this.pickGenerator());
       return b;
     } catch (final QuickBuilderError e) {
@@ -59,13 +61,15 @@ public class TypeScanner<T, B extends Builder<T>> {
 
   private void checkSuppliedInterface() {
     if (!this.builder.isInterface()) {
-      throw new QuickBuilderError("Cannot create a builder from " + this.builder.getName() + " becuase it is not an interface.");
+      throw new QuickBuilderError("Cannot create a builder from "
+          + this.builder.getName() + " becuase it is not an interface.");
     }
-    
+
     if (!Modifier.isPublic(this.builder.getModifiers())) {
-      throw new QuickBuilderError("Cannot implement the interface " + this.builder.getName() + " because it is not public"); 
+      throw new QuickBuilderError("Cannot implement the interface "
+          + this.builder.getName() + " because it is not public");
     }
-    
+
   }
 
   @SuppressWarnings("unchecked")
@@ -90,7 +94,7 @@ public class TypeScanner<T, B extends Builder<T>> {
     checkProperties(ps, userProperties);
 
     final BuilderBuilder bb = new BuilderBuilder(builderName, proxiedName,
-        builtTypeName, isMutable, ps);
+        builtTypeName, this.isMutable, ps);
 
     return (Class<B>) cl.createClass(bb.build(), builderName.replace('/', '.'));
   }
@@ -114,7 +118,7 @@ public class TypeScanner<T, B extends Builder<T>> {
 
   }
 
-  private Generator<B,T> pickGenerator() throws SecurityException,
+  private Generator<B, T> pickGenerator() throws SecurityException,
       NoSuchMethodException {
     if (this.g != null) {
       return this.g;
@@ -151,10 +155,9 @@ public class TypeScanner<T, B extends Builder<T>> {
     for (final Method m : this.builder.getMethods()) {
       if (isPropertyMethod(m)) {
         checkWithMethod(m);
-        
+
         findBridgeMethodReturnTypeIfAny(m);
-        
-        
+
         final String prefix = extractPrefix(m.getName());
         final String name = extractName(prefix, m);
         final String owner = m.getDeclaringClass().getName().replace(".", "/");
@@ -162,33 +165,34 @@ public class TypeScanner<T, B extends Builder<T>> {
         final org.objectweb.asm.Type declared = Type
             .getType(findDeclaredType(m));
 
-        ps.add(new Property(name, owner, prefix, type, declared, findBridgeMethodReturnTypeIfAny(m), findSetter(builtType, name, type)));
+        ps.add(new Property(name, owner, prefix, type, declared,
+            findBridgeMethodReturnTypeIfAny(m), findSetter(builtType, name,
+                type)));
       }
     }
     return ps;
   }
 
   private Type findBridgeMethodReturnTypeIfAny(final Method m) {
-    java.lang.reflect.Type rType = m.getGenericReturnType();
-    if ( rType instanceof TypeVariable ) {
-     return Type
-          .getType(m.getReturnType());
+    final java.lang.reflect.Type rType = m.getGenericReturnType();
+    if (rType instanceof TypeVariable) {
+      return Type.getType(m.getReturnType());
     }
     return null;
   }
 
-  private String extractPrefix(String name) {
+  private String extractPrefix(final String name) {
     return StringUtils.parseCamelCase(name)[0];
   }
 
   private boolean isPropertyMethod(final Method m) {
-    String name = m.getName();
+    final String name = m.getName();
     return (!name.startsWith(USER_PROPERTY_PREFIX)
-        && !m.getDeclaringClass().equals(Builder.class) && StringUtils
-        .parseCamelCase(name).length > 1);
+        && !m.getDeclaringClass().equals(Builder.class) && (StringUtils
+        .parseCamelCase(name).length > 1));
   }
 
-  private void checkWithMethod(Method m) {
+  private void checkWithMethod(final Method m) {
     if (!m.getReturnType().isAssignableFrom(this.builder)) {
       throw new QuickBuilderError(m.getName()
           + " should declare return type as " + this.builder.getName());
@@ -202,19 +206,20 @@ public class TypeScanner<T, B extends Builder<T>> {
   }
 
   private org.objectweb.asm.Type findPropertyType(final Method m) {
-    Class<?> paramType = findDeclaredType(m);
+    final Class<?> paramType = findDeclaredType(m);
     Class<?> t = paramType;
     if (t.equals(Builder.class)) {
-      java.lang.reflect.ParameterizedType ty = (ParameterizedType) m
+      final java.lang.reflect.ParameterizedType ty = (ParameterizedType) m
           .getGenericParameterTypes()[0];
-      java.lang.reflect.Type typeArgument = ty.getActualTypeArguments()[0];
-      
-      if ( typeArgument instanceof Class<?> ) {
+      final java.lang.reflect.Type typeArgument = ty.getActualTypeArguments()[0];
+
+      if (typeArgument instanceof Class<?>) {
         t = (Class<?>) typeArgument;
       } else {
-        throw new QuickBuilderError("Unable to determine property type for  " + m.getName() + " as wildcards not currently supported");
+        throw new QuickBuilderError("Unable to determine property type for  "
+            + m.getName() + " as wildcards not currently supported");
       }
-      
+
     } else if (Builder.class.isAssignableFrom(t)) {
       t = (Class<?>) GenericTypeReflector.getTypeParameter(paramType,
           Builder.class.getTypeParameters()[0]);
@@ -228,7 +233,7 @@ public class TypeScanner<T, B extends Builder<T>> {
   }
 
   private Class<?> findDeclaredType(final Method m) {
-    Class<?> t = m.getParameterTypes()[0];
+    final Class<?> t = m.getParameterTypes()[0];
     return t;
   }
 
@@ -240,13 +245,14 @@ public class TypeScanner<T, B extends Builder<T>> {
         final String n = extractName(USER_PROPERTY_PREFIX, m);
         final org.objectweb.asm.Type type = org.objectweb.asm.Type
             .getReturnType(m);
-        ps.add(new Property(n, null, USER_PROPERTY_PREFIX, type, type,null, findSetter(builtType, n, type)));
+        ps.add(new Property(n, null, USER_PROPERTY_PREFIX, type, type, null,
+            findSetter(builtType, n, type)));
       }
     }
     return ps;
   }
 
-  private void checkUnderScoreMethod(Method m) {
+  private void checkUnderScoreMethod(final Method m) {
     if (m.getParameterTypes().length != 0) {
       throw new QuickBuilderError(m.getName() + " should not have parameters");
     }

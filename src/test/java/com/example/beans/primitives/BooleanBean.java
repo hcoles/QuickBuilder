@@ -1,16 +1,15 @@
 package com.example.beans.primitives;
 
 public class BooleanBean {
-  
+
   private boolean b;
 
   public boolean isB() {
-    return b;
+    return this.b;
   }
 
-  public void setB(boolean b) {
+  public void setB(final boolean b) {
     this.b = b;
   }
-  
 
 }

@@ -1,27 +1,24 @@
 package com.example.beans;
 
 public class CompositeBean {
-  
+
   private FruitBean fruit;
   private FruitBean moreFruit;
 
   public FruitBean getFruit() {
-    return fruit;
+    return this.fruit;
   }
 
-  public void setFruit(FruitBean fruit) {
+  public void setFruit(final FruitBean fruit) {
     this.fruit = fruit;
   }
 
   public FruitBean getMoreFruit() {
-    return moreFruit;
+    return this.moreFruit;
   }
 
-  public void setMoreFruit(FruitBean moreFruit) {
+  public void setMoreFruit(final FruitBean moreFruit) {
     this.moreFruit = moreFruit;
   }
-  
-  
-  
 
 }
