@@ -22,7 +22,7 @@ It's on [maven central](http://search.maven.org/#search|ga|1|a%3A%22quickbuilder
 <dependency>
     <groupId>org.pitest.quickbuilder</groupId>
     <artifactId>quickbuilder</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
 
@@ -229,6 +229,10 @@ Other approaches you might want to consider
 * http://projectlombok.org/api/lombok/experimental/Builder.html
 
 # Releases
+
+## 1.1
+
+Builders immutable when generating sequences
 
 ## 1.0
 
