@@ -58,5 +58,9 @@ public class Sequences {
     }
     return ts;
   }
+  
+  public static <T> Builder<T> limit(final Builder<T> builder, final int times) {
+    return LimitingBuilder.limit(times, builder);
+  }
 
 }
