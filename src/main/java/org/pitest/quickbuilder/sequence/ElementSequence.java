@@ -29,7 +29,7 @@ public final class ElementSequence<T> implements Builder<T> {
 
   @Override
   public T build() {
-    if (this.position >= this.ts.size()) {
+    if (this.position == this.ts.size()) {
       throw new NoValueAvailableError(
           "Requested a value from sequence, but no values available");
     }

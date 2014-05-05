@@ -16,6 +16,10 @@ public class ConstantBuilder<T> implements Builder<T> {
     this.value = value;
   }
 
+  public static <T> ConstantBuilder<T> constant(T value) {
+    return new ConstantBuilder<T>(value);
+  }
+  
   @Override
   public T build() {
     return this.value;
