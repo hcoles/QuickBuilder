@@ -13,7 +13,7 @@ import org.pitest.quickbuilder.internal.Iterables;
  * 
  * @param <T> Type to build
  */
-public final class ElementSequence<T> implements Builder<T> {
+public final class ElementSequence<T> implements SequenceBuilder<T> {
 
   private final List<T> ts;
   private final int     position;
@@ -49,4 +49,19 @@ public final class ElementSequence<T> implements Builder<T> {
     return Maybe.none();
   }
 
+  @Override
+  public List<T> build(int number) {
+    return Sequences.build(this, number);
+  }
+
+  @Override
+  public List<T> buildAll() {
+    return Sequences.buildAll(this);
+  }
+
+  @Override
+  public SequenceBuilder<T> limit(int limit) {
+    return Sequences.limit(this,limit);
+  }
+  
 }

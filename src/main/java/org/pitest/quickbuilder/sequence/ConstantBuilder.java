@@ -29,4 +29,5 @@ public class ConstantBuilder<T> implements Builder<T> {
   public Maybe<Builder<T>> next() {
     return Maybe.<Builder<T>> some(this);
   }
+
 }

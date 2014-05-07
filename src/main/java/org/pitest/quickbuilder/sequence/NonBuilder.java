@@ -1,5 +1,8 @@
 package org.pitest.quickbuilder.sequence;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.Maybe;
 import org.pitest.quickbuilder.NoValueAvailableError;
@@ -9,7 +12,7 @@ import org.pitest.quickbuilder.NoValueAvailableError;
  *
  * @param <T> Type to never build
  */
-public class NonBuilder<T> implements Builder<T> {
+public class NonBuilder<T> implements SequenceBuilder<T> {
 
   @Override
   public T build() {
@@ -21,4 +24,19 @@ public class NonBuilder<T> implements Builder<T> {
     return Maybe.none();
   }
 
+  @Override
+  public List<T> build(int number) {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<T> buildAll() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public SequenceBuilder<T> limit(int limit) {
+    return this;
+  }
+  
 }

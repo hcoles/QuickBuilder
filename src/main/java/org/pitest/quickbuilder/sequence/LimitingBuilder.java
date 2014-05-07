@@ -1,19 +1,24 @@
 package org.pitest.quickbuilder.sequence;
 
+import java.util.List;
+
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.Maybe;
 
-public class LimitingBuilder<T> implements Builder<T> {
+public class LimitingBuilder<T> implements SequenceBuilder<T> {
 
   private final Builder<T> child;
   private final int        remaining;
 
   private LimitingBuilder(int times, Builder<T> child) {
     remaining = times - 1;
-    this.child = replaceIfZero(times,child);
+    this.child = child;
   }
 
-  public static <T> LimitingBuilder<T> limit(int times, Builder<T> child) {
+  public static <T> SequenceBuilder<T> limit(int times, Builder<T> child) {
+    if ( times <= 0 ) {
+      return new NonBuilder<T>();
+    }
     return new LimitingBuilder<T>(times, child);
   }
 
@@ -30,11 +35,18 @@ public class LimitingBuilder<T> implements Builder<T> {
     return Maybe.none();
   }
   
-  private static <T> Builder<T> replaceIfZero(int times, Builder<T> child) {
-    if ( times <= 0 ) {
-      return new NonBuilder<T>();
-    }
-    return child;
+  @Override
+  public SequenceBuilder<T> limit(int limit) {
+    return LimitingBuilder.limit(limit, this);
   }
 
+  @Override
+  public List<T> build(int number) {
+    return Sequences.build(this, number);
+  }
+
+  @Override
+  public List<T> buildAll() {
+    return Sequences.buildAll(this);
+  }
 }

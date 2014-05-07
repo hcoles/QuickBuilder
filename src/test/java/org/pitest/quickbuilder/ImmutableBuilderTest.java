@@ -525,4 +525,5 @@ public class ImmutableBuilderTest {
     ABeanBuilderWithMaybeUnderScore builder = QB.builder(ABeanBuilderWithMaybeUnderScore.class).withFoo(new ConstantBuilder<String>("foo"));
     assertThat(builder.build().getFoo()).isNull();
   }
+  
 }

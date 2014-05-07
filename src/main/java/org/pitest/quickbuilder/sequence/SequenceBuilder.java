@@ -36,4 +36,12 @@ public interface SequenceBuilder<T> extends Builder<T> {
    * @return A List of Ts.
    */
   List<T> buildAll();
+  
+  /**
+   * Limits the sequence represented by this builder.
+   * 
+   * @param limit The maximum length of the sequence
+   * @return A builder sequence of at most limit length
+   */
+  SequenceBuilder<T> limit(int limit);
 }

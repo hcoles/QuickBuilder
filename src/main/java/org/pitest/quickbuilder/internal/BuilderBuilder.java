@@ -97,6 +97,7 @@ class BuilderBuilder {
     createNextMethod(cw);
     createSequenceBuildMethod(cw);
     createBuildAllMethod(cw);
+    createLimitMethod(cw);
 
     cw.visitEnd();
 
@@ -647,5 +648,16 @@ class BuilderBuilder {
     mv.visitMaxs(2, 2);
     mv.visitEnd();
   }
+  
+  private void createLimitMethod(final ClassWriter cw) {
+    final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "limit", "(I)Lorg/pitest/quickbuilder/sequence/SequenceBuilder;", "(I)Lorg/pitest/quickbuilder/sequence/SequenceBuilder<TT;>;", null);
+    mv.visitCode();
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitVarInsn(ILOAD, 1);
+    mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/sequence/Sequences", "limit", "(Lorg/pitest/quickbuilder/Builder;I)Lorg/pitest/quickbuilder/sequence/SequenceBuilder;", false);
+    mv.visitInsn(ARETURN);
+    mv.visitMaxs(2, 2);
+    mv.visitEnd();
+    }
 
 }

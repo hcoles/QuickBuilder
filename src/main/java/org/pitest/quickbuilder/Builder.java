@@ -17,7 +17,12 @@ public interface Builder<T> {
    */
   T build();
 
+  /**
+   * Returns the next builder in the sequence if available.
+   * 
+   * @return Some T or None
+   */
   Maybe<Builder<T>> next();
-  
+ 
 
 }

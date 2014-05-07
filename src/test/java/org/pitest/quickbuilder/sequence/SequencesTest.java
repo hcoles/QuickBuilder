@@ -46,6 +46,12 @@ public class SequencesTest {
     final List<FruitBean> actual = builder.buildAll();
     assertThat(actual).hasSize(2);
   }
+  
+  @Test
+  public void shouldLimitSequences() {
+    final SequenceBuilder<FruitBean> builder = QB.builder(FruitBuilder.class).limit(12);
+    assertThat(builder.buildAll()).hasSize(12);
+  }
 
   private Condition<FruitBean> fruitWithId(final String id) {
     return new Condition<FruitBean>() {

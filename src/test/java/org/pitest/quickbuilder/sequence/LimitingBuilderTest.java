@@ -7,14 +7,13 @@ import static org.pitest.quickbuilder.sequence.ElementSequence.from;
 import java.util.List;
 
 import org.junit.Test;
-import org.pitest.quickbuilder.Builder;
 
 public class LimitingBuilderTest {
 
   @Test
   public void shouldLimitSequences() {
-    Builder<String> limited = LimitingBuilder.limit(3, from(asList("1","2","3","4")));
-    List<String> actual = Sequences.buildAll(limited);
+    SequenceBuilder<String> limited = LimitingBuilder.limit(3, from(asList("1","2","3","4")));
+    List<String> actual = limited.buildAll();
     
     assertThat(actual).containsExactly("1","2","3");
     
@@ -22,13 +21,30 @@ public class LimitingBuilderTest {
   
   @Test
   public void shouldLimitInfiniteSequences() {
-    Builder<String> limited = LimitingBuilder.limit(6, new ConstantBuilder<String>("a"));
-    List<String> actual = Sequences.buildAll(limited);
-    
-    assertThat(actual).containsExactly("a", "a", "a", "a", "a", "a");
-    
+    SequenceBuilder<String> limited = LimitingBuilder.limit(6, new ConstantBuilder<String>("a"));
+    assertThat(limited.buildAll()).containsExactly("a", "a", "a", "a", "a", "a");
+    assertThat(limited.limit(2).buildAll()).containsExactly("a", "a"); 
+  }
+  
+  @Test
+  public void shouldBuildRequestedNumberOfValuesWithinLimit() {
+    SequenceBuilder<String> limited = LimitingBuilder.limit(6, new ConstantBuilder<String>("a"));
+    assertThat(limited.build(3)).containsExactly("a", "a", "a");
+  }
+  
+  @Test
+  public void shouldLimitToNothingWhenSuppliedWithLimitOfZero() {
+    SequenceBuilder<String> limited = LimitingBuilder.limit(0, new ConstantBuilder<String>("a"));
+    assertThat(limited.buildAll()).isEmpty();
+    assertThat(limited.build(2)).isEmpty();
   }
 
+  @Test
+  public void shouldLimitToNothingWhenSuppliedWithLimitOfBelowZero() {
+    SequenceBuilder<String> limited = LimitingBuilder.limit(-1, new ConstantBuilder<String>("a"));
+    assertThat(limited.buildAll()).isEmpty();
+    assertThat(limited.build(2)).isEmpty();
+  }
 
 
 }
