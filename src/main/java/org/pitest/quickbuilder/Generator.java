@@ -10,6 +10,12 @@ package org.pitest.quickbuilder;
  */
 public interface Generator<B extends Builder<T>, T> {
 
+  /**
+   * Creates an instance of T from B
+   * 
+   * @param builder Builder from which to source values
+   * @return An instance of T
+   */
   T generate(B builder);
 
 }
