@@ -8,6 +8,7 @@ import org.pitest.quickbuilder.sequence.Integers;
 import org.pitest.quickbuilder.sequence.NullBuilder;
 import org.pitest.quickbuilder.sequence.RepeatedBuilder;
 import org.pitest.quickbuilder.sequence.SequenceBuilder;
+import org.pitest.quickbuilder.sequence.Sequences;
 
 public class Builders {
 
@@ -47,7 +48,7 @@ public class Builders {
    * @param<T> Type to build 
    * @return A builder sequence of exactly 1 length
    */
-  public static <T> RepeatedBuilder<T> once(Builder<T> builder) {
+  public static <T> SequenceBuilder<T> once(Builder<T> builder) {
     return RepeatedBuilder.once(builder);
   }
   
@@ -59,7 +60,7 @@ public class Builders {
    * @param<T> Type to build 
    * @return A builder sequence of exactly 1 length
    */
-  public static <T> RepeatedBuilder<T> once(T value) {
+  public static <T> SequenceBuilder<T> once(T value) {
     return once(constant(value));
   }
   
@@ -71,8 +72,8 @@ public class Builders {
    * @param<T> Type to build
    * @return A builder that always returns the same value
    */
-  public static <T> Builder<T> constant(T value) {
-    return ConstantBuilder.constant(value);
+  public static <T> SequenceBuilder<T> constant(T value) {
+    return Sequences.decorate(ConstantBuilder.constant(value));
   }
   
   /**
@@ -83,7 +84,7 @@ public class Builders {
    * @param<T> Type to build
    * @return A builder that always returns the same value
    */
-  public static <T> Builder<T> theSame(Builder<T> builder) {
+  public static <T> SequenceBuilder<T> theSame(Builder<T> builder) {
     return constant(builder.build());
   }
   
@@ -95,8 +96,8 @@ public class Builders {
    * @param<T> Type to build
    * @return A builder that always returns the same value
    */
-  public static <T> Builder<T> nullValue() {
-    return new NullBuilder<T>();
+  public static <T> SequenceBuilder<T> nullValue() {
+    return Sequences.decorate(new NullBuilder<T>());
   }
   
   /**

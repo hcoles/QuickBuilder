@@ -82,4 +82,16 @@ public abstract class Sequences {
   public static <T> Iterator<T> iterator(Builder<T> builder) {
      return BuilderIterator.iterator(builder);
   }
+  
+  /**
+   * Wraps a builder in the richer SequenceBuilder interface
+   * 
+   * 
+   * @param builder The builder to iterator over
+   * @param<T> Type to build
+   * @return An iterator over the values in the builder
+   */
+  public static <T> SequenceBuilder<T> decorate(Builder<T> builder) {
+     return new SequenceWrapper<T>(builder);
+  }  
 }
