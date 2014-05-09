@@ -1,5 +1,7 @@
 package org.pitest.quickbuilder;
 
+import org.pitest.quickbuilder.builders.QB;
+
 /**
  * Builder interface which must be extended by all QuickBuilder interfaces. It
  * should not be implemented by concrete classes, instead the extended interface

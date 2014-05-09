@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.assertj.core.api.Condition;
 import org.junit.Test;
+import org.pitest.quickbuilder.builders.QB;
 import org.pitest.quickbuilder.sequence.ConstantBuilder;
 import org.pitest.quickbuilder.sequence.ElementSequence;
 import org.pitest.quickbuilder.sequence.NonBuilder;

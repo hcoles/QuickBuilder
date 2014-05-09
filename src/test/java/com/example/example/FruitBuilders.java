@@ -2,7 +2,7 @@ package com.example.example;
 
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.Generator;
-import org.pitest.quickbuilder.QB;
+import org.pitest.quickbuilder.builders.QB;
 
 public class FruitBuilders {
 

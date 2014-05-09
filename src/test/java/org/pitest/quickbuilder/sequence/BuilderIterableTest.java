@@ -2,8 +2,8 @@ package org.pitest.quickbuilder.sequence;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.pitest.quickbuilder.sequence.Sequences.asString;
-import static org.pitest.quickbuilder.sequence.Sequences.integersFrom;
+import static org.pitest.quickbuilder.builders.Builders.asString;
+import static org.pitest.quickbuilder.builders.Builders.integersFrom;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

@@ -1,7 +1,7 @@
 package com.example.beans;
 
 import org.pitest.quickbuilder.Generator;
-import org.pitest.quickbuilder.QB;
+import org.pitest.quickbuilder.builders.QB;
 
 public class Fruits {
 

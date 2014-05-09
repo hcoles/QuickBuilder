@@ -1,5 +1,7 @@
-package org.pitest.quickbuilder;
+package org.pitest.quickbuilder.builders;
 
+import org.pitest.quickbuilder.Builder;
+import org.pitest.quickbuilder.Generator;
 import org.pitest.quickbuilder.internal.TypeScanner;
 
 /**

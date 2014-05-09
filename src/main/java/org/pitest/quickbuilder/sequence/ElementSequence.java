@@ -7,7 +7,6 @@ import java.util.List;
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.Maybe;
 import org.pitest.quickbuilder.NoValueAvailableError;
-import org.pitest.quickbuilder.internal.Iterables;
 
 /**
  * Generates a builder that iterates through the supplied values.
@@ -25,7 +24,7 @@ public final class ElementSequence<T> implements SequenceBuilder<T> {
   }
 
   public static <T> ElementSequence<T> from(final Iterable<T> ts) {
-    return new ElementSequence<T>(Iterables.asList(ts), 0);
+    return new ElementSequence<T>(asList(ts), 0);
   }
 
   @Override
@@ -69,5 +68,13 @@ public final class ElementSequence<T> implements SequenceBuilder<T> {
   public Iterator<T> iterator() {
     return Sequences.iterator(this);
   }  
+ 
+  private static <T> List<T> asList(final Iterable<T> ts) {
+    final List<T> l = new ArrayList<T>(10);
+    for (final T each : ts) {
+      l.add(each);
+    }
+    return l;
+  }
   
 }

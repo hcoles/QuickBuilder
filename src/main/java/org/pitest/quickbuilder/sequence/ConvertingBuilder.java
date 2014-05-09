@@ -12,7 +12,7 @@ public class ConvertingBuilder<A,T> implements SequenceBuilder<T> {
   private final Builder<A> child;
   private final Conversion<A,T> converter;
   
-  ConvertingBuilder(Builder<A> child, Conversion<A,T> converter) {
+  public ConvertingBuilder(Builder<A> child, Conversion<A,T> converter) {
     this.child = child;
     this.converter = converter;
   }

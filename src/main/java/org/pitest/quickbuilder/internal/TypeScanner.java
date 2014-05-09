@@ -14,7 +14,6 @@ import org.objectweb.asm.Type;
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.Generator;
 import org.pitest.quickbuilder.Maybe;
-import org.pitest.quickbuilder.QB;
 import org.pitest.quickbuilder.QuickBuilderError;
 import org.pitest.quickbuilder.sequence.SequenceBuilder;
 
@@ -25,7 +24,7 @@ public class TypeScanner<T, B extends Builder<T>> {
   private static final String   USER_PROPERTY_PREFIX = "_";
 
   private final static QBLoader cl                   = new QBLoader(
-                                                         QB.class
+                                                         TypeScanner.class
                                                              .getClassLoader());
 
   private final Class<B>        builder;
@@ -99,19 +98,22 @@ public class TypeScanner<T, B extends Builder<T>> {
   }
 
   private void disableSettersForUserHandledProperties(final List<Property> ps,
-      final Set<Property> userProperties, Class<T> builtType) {
+      final Set<Property> userProperties, final Class<T> builtType) {
     for (final Property each : ps) {
       if (userProperties.contains(each)) {
         each.disableSetter();
       } else {
         if (!each.isHasSetter()) {
           throw new QuickBuilderError(
-              "Can't create builder from " + this.builder.getName() + " : "
+              "Can't create builder from "
+                  + this.builder.getName()
+                  + " : "
                   + "No setter found for "
                   + each.name()
                   + " of type "
                   + each.type()
-                  + " on the built class " + builtType.getName()
+                  + " on the built class "
+                  + builtType.getName()
                   + ".\nCheck name and type or declare an underscore method and generator to handle it yourself.");
         }
       }
@@ -231,17 +233,16 @@ public class TypeScanner<T, B extends Builder<T>> {
     return t;
   }
 
-  private Class<?> findPropertyTypeFromGenericInterface(ParameterizedType ty, final Method m) {
+  private Class<?> findPropertyTypeFromGenericInterface(
+      final ParameterizedType ty, final Method m) {
     final java.lang.reflect.Type typeArgument = ty.getActualTypeArguments()[0];
     if (typeArgument instanceof Class<?>) {
-      return(Class<?>) typeArgument;
+      return (Class<?>) typeArgument;
     } else {
       throw new QuickBuilderError("Unable to determine property type for  "
           + m.getName() + " as wildcards not currently supported");
     }
   }
-  
-  
 
   private Class<?> findDeclaredType(final Method m) {
     final Class<?> t = m.getParameterTypes()[0];
@@ -262,17 +263,19 @@ public class TypeScanner<T, B extends Builder<T>> {
     return ps;
   }
 
-  private String findPrefix(String name) {
+  private String findPrefix(final String name) {
     if (name.startsWith("__")) {
       return "__";
     }
     return USER_PROPERTY_PREFIX;
   }
 
-  private Type findType(Method m) {
+  private Type findType(final Method m) {
     if (m.getReturnType().equals(Maybe.class)) {
-      final java.lang.reflect.ParameterizedType ty = (ParameterizedType) m.getGenericReturnType();
-      return  org.objectweb.asm.Type.getType(findPropertyTypeFromGenericInterface(ty, m));
+      final java.lang.reflect.ParameterizedType ty = (ParameterizedType) m
+          .getGenericReturnType();
+      return org.objectweb.asm.Type
+          .getType(findPropertyTypeFromGenericInterface(ty, m));
     }
     return org.objectweb.asm.Type.getReturnType(m);
   }
