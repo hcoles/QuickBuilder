@@ -79,7 +79,7 @@
 				<version>2.4</version>
 				<configuration>
 					<source>1.6</source>
-					<target>1.6</target>
+					<target>1.5</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -87,7 +87,6 @@
 				<artifactId>pitest-maven</artifactId>
 				<version>0.33</version>
 				<executions>
-					<!-- bound here to test, most commonly bound to verify -->
 					<execution>
 						<id>verify</id>
 						<phase>verify</phase>

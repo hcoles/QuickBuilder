@@ -1,5 +1,6 @@
 package org.pitest.quickbuilder.sequence;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.pitest.quickbuilder.Builder;
@@ -42,5 +43,10 @@ public class Integers implements SequenceBuilder<Integer> {
   public SequenceBuilder<Integer> limit(int limit) {
     return Sequences.limit(this, limit);
   }
+  
+  @Override
+  public Iterator<Integer> iterator() {
+    return Sequences.iterator(this);
+  }  
 
 }

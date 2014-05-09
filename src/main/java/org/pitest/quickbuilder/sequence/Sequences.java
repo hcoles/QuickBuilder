@@ -1,6 +1,7 @@
 package org.pitest.quickbuilder.sequence;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.pitest.quickbuilder.Builder;
@@ -169,6 +170,30 @@ public abstract class Sequences {
    */
   public static SequenceBuilder<Integer> integersFrom(int start) {
     return Integers.integersFrom(start);
+  }
+  
+  /**
+   * Converts a builder to return a string representation of it type
+   * 
+   * 
+   * @param builder The builder to supply the value
+   * @param<T> Type to build
+   * @return A builder that returns string representations of the built value
+   */
+  public static <T> SequenceBuilder<String> asString(Builder<T> builder) {
+    return new ConvertingBuilder<T,String>(builder, new AsString<T>());
+  }
+  
+  /**
+   * Creates an iterator over the values in the builder
+   * 
+   * 
+   * @param builder The builder to iterator over
+   * @param<T> Type to build
+   * @return An iterator over the values in the builder
+   */
+  public static <T> Iterator<T> iterator(Builder<T> builder) {
+     return BuilderIterator.iterator(builder);
   }
   
 }

@@ -29,4 +29,9 @@ public class RepeatedBuilderTest {
     assertThat(testee.build(2)).isEmpty();
   }  
 
+  @Test
+  public void shouldIterateOverValues() {
+    testee = RepeatedBuilder.repeat(2,constant("foo"));
+    assertThat(testee.iterator().next()).isEqualTo("foo");
+  }
 }

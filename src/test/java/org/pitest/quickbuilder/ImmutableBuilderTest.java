@@ -8,10 +8,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.assertj.core.api.Condition;
 import org.junit.Test;
 import org.pitest.quickbuilder.sequence.ConstantBuilder;
 import org.pitest.quickbuilder.sequence.ElementSequence;
 import org.pitest.quickbuilder.sequence.NonBuilder;
+import org.pitest.quickbuilder.sequence.SequenceBuilder;
+import org.pitest.quickbuilder.sequence.Sequences;
 
 import com.example.beans.ArrayBean;
 import com.example.beans.ArrayBeanBuilder;
@@ -525,5 +528,62 @@ public class ImmutableBuilderTest {
     ABeanBuilderWithMaybeUnderScore builder = QB.builder(ABeanBuilderWithMaybeUnderScore.class).withFoo(new ConstantBuilder<String>("foo"));
     assertThat(builder.build().getFoo()).isNull();
   }
+  
+  @Test
+  public void shouldConsumeAllOfLimitedSequences() {
+    final FruitBuilder builder = QB.builder(FruitBuilder.class).withId(
+        ElementSequence.from(Arrays.asList("one", "two")));
+    final List<FruitBean> actual = Sequences.buildAll(builder);
+    assertThat(actual).hasSize(2);
+  }
+
+  @Test
+  public void shouldBuildListsOfRequestedSize() {
+    final FruitBuilder builder = QB.builder(FruitBuilder.class).withId(
+        ElementSequence.from(Arrays.asList("repeated", "two", "repeated")));
+    final List<FruitBean> expected = Sequences.build(builder, 2);
+    assertThat(expected.size()).isEqualTo(2);
+    assertThat(expected).haveExactly(1, fruitWithId("repeated"));
+    assertThat(expected).haveExactly(1, fruitWithId("two"));
+  }
+
+  @Test
+  public void shouldBuildListsOfRequestedSizeViaInstanceMethod() {
+    final FruitBuilder builder = QB.builder(FruitBuilder.class);
+    final List<FruitBean> expected = builder.build(2);
+    assertThat(expected.size()).isEqualTo(2);
+  }
+
+  @Test
+  public void shouldConsumeAllOfSmallestSequencesWhenBuidAllCalledViaInstanceMethod() {
+    final FruitBuilder builder = QB.builder(FruitBuilder.class).withId(
+        ElementSequence.from(Arrays.asList("one", "two")));
+    final List<FruitBean> actual = builder.buildAll();
+    assertThat(actual).hasSize(2);
+  }
+  
+  @Test
+  public void shouldLimitSequences() {
+    final SequenceBuilder<FruitBean> builder = QB.builder(FruitBuilder.class).limit(12);
+    assertThat(builder.buildAll()).hasSize(12);
+  }
+  
+  @Test
+  public void shouldImplementIteratorMethod() {
+    final SequenceBuilder<FruitBean> builder = QB.builder(FruitBuilder.class);
+    assertThat(builder.iterator().next()).isNotNull();
+  }
+  
+  
+  private Condition<FruitBean> fruitWithId(final String id) {
+    return new Condition<FruitBean>() {
+      @Override
+      public boolean matches(final FruitBean arg0) {
+        return arg0.getId().equals(id);
+      }
+
+    };
+  }
+
   
 }

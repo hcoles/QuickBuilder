@@ -1,5 +1,6 @@
 package org.pitest.quickbuilder.sequence;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.pitest.quickbuilder.Builder;
@@ -53,5 +54,10 @@ public class RepeatedBuilder<T> implements SequenceBuilder<T> {
   public List<T> buildAll() {
     return Sequences.buildAll(this);
   }
+  
+  @Override
+  public Iterator<T> iterator() {
+    return Sequences.iterator(this);
+  }  
 
 }

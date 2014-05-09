@@ -38,4 +38,10 @@ public class IntegersTest {
     assertThat(testee.build(2)).containsExactly(Integer.MAX_VALUE,Integer.MIN_VALUE);
   } 
   
+  @Test
+  public void shouldIterateOverValues() {
+    testee = Integers.integersFrom(0);
+    assertThat(testee.iterator().next()).isEqualTo(0);
+  } 
+  
 }

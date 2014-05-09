@@ -34,5 +34,11 @@ public class ElementSequenceTest {
     this.testee = ElementSequence.from(Arrays.asList("a", "b", "c"));
     assertThat(this.testee.limit(2).buildAll()).hasSize(2);
   }
+  
+  @Test
+  public void shouldIterateOverValues() {
+    this.testee = ElementSequence.from(Arrays.asList("a", "b"));
+    assertThat(this.testee.iterator().next()).isEqualTo("a");
+  }  
 
 }

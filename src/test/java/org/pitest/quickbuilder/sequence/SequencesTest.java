@@ -2,10 +2,8 @@ package org.pitest.quickbuilder.sequence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Iterator;
 
-import org.assertj.core.api.Condition;
 import org.junit.Test;
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.QB;
@@ -14,45 +12,6 @@ import com.example.beans.FruitBean;
 import com.example.beans.FruitBuilder;
 
 public class SequencesTest {
-
-  @Test
-  public void shouldConsumeAllOfLimitedSequences() {
-    final FruitBuilder builder = QB.builder(FruitBuilder.class).withId(
-        ElementSequence.from(Arrays.asList("one", "two")));
-    final List<FruitBean> actual = Sequences.buildAll(builder);
-    assertThat(actual).hasSize(2);
-  }
-
-  @Test
-  public void shouldBuildListsOfRequestedSize() {
-    final FruitBuilder builder = QB.builder(FruitBuilder.class).withId(
-        ElementSequence.from(Arrays.asList("repeated", "two", "repeated")));
-    final List<FruitBean> expected = Sequences.build(builder, 2);
-    assertThat(expected.size()).isEqualTo(2);
-    assertThat(expected).haveExactly(1, fruitWithId("repeated"));
-    assertThat(expected).haveExactly(1, fruitWithId("two"));
-  }
-
-  @Test
-  public void shouldBuildListsOfRequestedSizeViaInstanceMethod() {
-    final FruitBuilder builder = QB.builder(FruitBuilder.class);
-    final List<FruitBean> expected = builder.build(2);
-    assertThat(expected.size()).isEqualTo(2);
-  }
-
-  @Test
-  public void shouldConsumeAllOfSmallestSequencesWhenBuidAllCalledViaInstanceMethod() {
-    final FruitBuilder builder = QB.builder(FruitBuilder.class).withId(
-        ElementSequence.from(Arrays.asList("one", "two")));
-    final List<FruitBean> actual = builder.buildAll();
-    assertThat(actual).hasSize(2);
-  }
-  
-  @Test
-  public void shouldLimitSequences() {
-    final SequenceBuilder<FruitBean> builder = QB.builder(FruitBuilder.class).limit(12);
-    assertThat(builder.buildAll()).hasSize(12);
-  }
   
   @Test
   public void shouldReturnValuesOnlyOnce() {
@@ -84,14 +43,19 @@ public class SequencesTest {
     assertThat(builder.build(3)).containsExactly(2,3,4);
   }
   
-  private Condition<FruitBean> fruitWithId(final String id) {
-    return new Condition<FruitBean>() {
-      @Override
-      public boolean matches(final FruitBean arg0) {
-        return arg0.getId().equals(id);
-      }
-
-    };
+  
+  @Test
+  public void shouldConvertValuesToStrings() {
+    final SequenceBuilder<String> builder = Sequences.asString(Sequences.integersFrom(1));
+    assertThat(builder.build(3)).containsExactly("1","2","3");
   }
+  
+  @Test
+  public void shouldCreateIterators() {
+    Iterator<Integer> it = Sequences.iterator(Sequences.integersFrom(1));
+    assertThat(it.next()).isEqualTo(1);
+    assertThat(it.next()).isEqualTo(2);    
+  }
+  
 
 }

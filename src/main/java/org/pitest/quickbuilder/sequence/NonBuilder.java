@@ -1,6 +1,7 @@
 package org.pitest.quickbuilder.sequence;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.pitest.quickbuilder.Builder;
@@ -38,5 +39,10 @@ public class NonBuilder<T> implements SequenceBuilder<T> {
   public SequenceBuilder<T> limit(int limit) {
     return this;
   }
+  
+  @Override
+  public Iterator<T> iterator() {
+    return Sequences.iterator(this);
+  }  
   
 }

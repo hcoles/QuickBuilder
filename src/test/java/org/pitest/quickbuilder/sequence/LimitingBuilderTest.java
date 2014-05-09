@@ -46,5 +46,10 @@ public class LimitingBuilderTest {
     assertThat(limited.build(2)).isEmpty();
   }
 
+  @Test
+  public void shouldIterateOverValues() {
+    SequenceBuilder<String> limited = LimitingBuilder.limit(1, new ConstantBuilder<String>("a"));
+    assertThat(limited.iterator().next()).isEqualTo("a");
 
+  }
 }

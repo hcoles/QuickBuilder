@@ -31,4 +31,8 @@ public class NonBuilderTest {
     assertThat(testee.limit(42)).isEqualTo(testee);
   }
 
+  @Test
+  public void shouldIterateOverNothing() {
+    assertThat(testee.iterator().hasNext()).isEqualTo(false);
+  }
 }

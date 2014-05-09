@@ -43,4 +43,11 @@ public class ComposedBuilderTest {
     SequenceBuilder<String> actual = ComposedBuilder.compose(constant("1"));
     assertThat(actual.build(3)).hasSize(3);
   }
+  
+  @Test
+  public void shouldIterateOverValues() {
+    @SuppressWarnings("unchecked")
+    SequenceBuilder<String> actual = ComposedBuilder.compose(constant("1"));
+    assertThat(actual.iterator().next()).isEqualTo("1");
+  }
 }

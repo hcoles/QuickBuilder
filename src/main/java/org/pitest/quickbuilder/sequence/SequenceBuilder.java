@@ -9,7 +9,7 @@ import org.pitest.quickbuilder.Builder;
  * 
  * @param <T> The type to build
  */
-public interface SequenceBuilder<T> extends Builder<T> {
+public interface SequenceBuilder<T> extends Builder<T>, Iterable<T> {
 
   /**
    * Builds number instances of T.

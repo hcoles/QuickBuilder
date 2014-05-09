@@ -2,6 +2,7 @@ package org.pitest.quickbuilder.sequence;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -66,6 +67,11 @@ public class ComposedBuilder<T> implements SequenceBuilder<T> {
   @Override
   public SequenceBuilder<T> limit(int limit) {
     return Sequences.limit(this,limit);
+  }
+
+  @Override
+  public Iterator<T> iterator() {
+    return Sequences.iterator(this);
   }
 
 }
