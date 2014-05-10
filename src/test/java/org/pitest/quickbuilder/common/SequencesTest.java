@@ -60,5 +60,11 @@ public class SequencesTest {
     assertThat(it.next()).isEqualTo(2);    
   }
   
+  @Test
+  public void shouldComposeBuilder() {
+    @SuppressWarnings("unchecked")
+    SequenceBuilder<String> actual = Builders.compose(Builders.once("foo"), Builders.once("bar"));
+    assertThat(actual.buildAll()).containsExactly("foo", "bar");
+  }
 
 }

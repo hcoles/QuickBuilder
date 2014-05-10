@@ -3,6 +3,7 @@ package org.pitest.quickbuilder.builders;
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.SequenceBuilder;
 import org.pitest.quickbuilder.common.AsString;
+import org.pitest.quickbuilder.common.ComposedBuilder;
 import org.pitest.quickbuilder.common.ConstantBuilder;
 import org.pitest.quickbuilder.common.ConvertingBuilder;
 import org.pitest.quickbuilder.common.Integers;
@@ -121,6 +122,17 @@ public class Builders {
    */
   public static <T> SequenceBuilder<String> asString(Builder<T> builder) {
     return new ConvertingBuilder<T,String>(builder, new AsString<T>());
+  }
+   
+  /**
+   * Combines builders into a sequence.
+   * 
+   * @param builders The builders to compose
+   * @param<T> Type to build
+   * @return A builder that returns a sequence composed of the supplied builders
+   */
+  public static <T> SequenceBuilder<T> compose(Builder<T> ... builders) {
+    return ComposedBuilder.compose(builders);
   }
    
   
