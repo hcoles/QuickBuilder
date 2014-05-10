@@ -1,8 +1,9 @@
-package org.pitest.quickbuilder.sequence;
+package org.pitest.quickbuilder.common;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.pitest.quickbuilder.common.AsString;
 
 public class AsStringTest {
 

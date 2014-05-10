@@ -11,11 +11,10 @@ import java.util.List;
 import org.assertj.core.api.Condition;
 import org.junit.Test;
 import org.pitest.quickbuilder.builders.QB;
-import org.pitest.quickbuilder.sequence.ConstantBuilder;
-import org.pitest.quickbuilder.sequence.ElementSequence;
-import org.pitest.quickbuilder.sequence.NonBuilder;
-import org.pitest.quickbuilder.sequence.SequenceBuilder;
-import org.pitest.quickbuilder.sequence.Sequences;
+import org.pitest.quickbuilder.common.ConstantBuilder;
+import org.pitest.quickbuilder.common.ElementSequence;
+import org.pitest.quickbuilder.common.NonBuilder;
+import org.pitest.quickbuilder.common.Sequences;
 
 import com.example.beans.ArrayBean;
 import com.example.beans.ArrayBeanBuilder;

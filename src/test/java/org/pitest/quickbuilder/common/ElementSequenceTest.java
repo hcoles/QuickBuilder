@@ -1,10 +1,11 @@
-package org.pitest.quickbuilder.sequence;
+package org.pitest.quickbuilder.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 
 import org.junit.Test;
+import org.pitest.quickbuilder.common.ElementSequence;
 
 public class ElementSequenceTest {
 

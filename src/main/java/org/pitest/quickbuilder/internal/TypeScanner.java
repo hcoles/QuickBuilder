@@ -15,7 +15,7 @@ import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.Generator;
 import org.pitest.quickbuilder.Maybe;
 import org.pitest.quickbuilder.QuickBuilderError;
-import org.pitest.quickbuilder.sequence.SequenceBuilder;
+import org.pitest.quickbuilder.SequenceBuilder;
 
 import com.googlecode.gentyref.GenericTypeReflector;
 

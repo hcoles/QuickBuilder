@@ -1,4 +1,4 @@
-package org.pitest.quickbuilder.sequence;
+package org.pitest.quickbuilder.common;
 
 import org.pitest.quickbuilder.Conversion;
 

@@ -1,4 +1,4 @@
-package org.pitest.quickbuilder.sequence;
+package org.pitest.quickbuilder.common;
 
 import java.util.Iterator;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.List;
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.Conversion;
 import org.pitest.quickbuilder.Maybe;
+import org.pitest.quickbuilder.SequenceBuilder;
 
 public class ConvertingBuilder<A,T> implements SequenceBuilder<T> {
   

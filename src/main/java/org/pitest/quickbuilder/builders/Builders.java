@@ -1,14 +1,14 @@
 package org.pitest.quickbuilder.builders;
 
 import org.pitest.quickbuilder.Builder;
-import org.pitest.quickbuilder.sequence.AsString;
-import org.pitest.quickbuilder.sequence.ConstantBuilder;
-import org.pitest.quickbuilder.sequence.ConvertingBuilder;
-import org.pitest.quickbuilder.sequence.Integers;
-import org.pitest.quickbuilder.sequence.NullBuilder;
-import org.pitest.quickbuilder.sequence.RepeatedBuilder;
-import org.pitest.quickbuilder.sequence.SequenceBuilder;
-import org.pitest.quickbuilder.sequence.Sequences;
+import org.pitest.quickbuilder.SequenceBuilder;
+import org.pitest.quickbuilder.common.AsString;
+import org.pitest.quickbuilder.common.ConstantBuilder;
+import org.pitest.quickbuilder.common.ConvertingBuilder;
+import org.pitest.quickbuilder.common.Integers;
+import org.pitest.quickbuilder.common.NullBuilder;
+import org.pitest.quickbuilder.common.RepeatedBuilder;
+import org.pitest.quickbuilder.common.Sequences;
 
 public class Builders {
 

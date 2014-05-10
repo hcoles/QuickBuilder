@@ -1,12 +1,15 @@
-package org.pitest.quickbuilder.sequence;
+package org.pitest.quickbuilder.common;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.pitest.quickbuilder.sequence.ElementSequence.from;
+import static org.pitest.quickbuilder.common.ElementSequence.from;
 
 import java.util.List;
 
 import org.junit.Test;
+import org.pitest.quickbuilder.SequenceBuilder;
+import org.pitest.quickbuilder.common.ConstantBuilder;
+import org.pitest.quickbuilder.common.LimitingBuilder;
 
 public class LimitingBuilderTest {
 

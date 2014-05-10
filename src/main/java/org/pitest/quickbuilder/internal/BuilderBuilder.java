@@ -42,8 +42,8 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.Generator;
-import org.pitest.quickbuilder.sequence.ConstantBuilder;
-import org.pitest.quickbuilder.sequence.SequenceBuilder;
+import org.pitest.quickbuilder.SequenceBuilder;
+import org.pitest.quickbuilder.common.ConstantBuilder;
 
 class BuilderBuilder {
 
@@ -630,7 +630,7 @@ class BuilderBuilder {
     mv.visitVarInsn(ALOAD, 0);
     mv.visitVarInsn(ILOAD, 1);
     mv.visitMethodInsn(INVOKESTATIC,
-        "org/pitest/quickbuilder/sequence/Sequences", "build",
+        "org/pitest/quickbuilder/common/Sequences", "build",
         "(Lorg/pitest/quickbuilder/Builder;I)Ljava/util/List;", false);
     mv.visitInsn(ARETURN);
     mv.visitMaxs(2, 2);
@@ -643,7 +643,7 @@ class BuilderBuilder {
     mv.visitCode();
     mv.visitVarInsn(ALOAD, 0);
     mv.visitMethodInsn(INVOKESTATIC,
-        "org/pitest/quickbuilder/sequence/Sequences", "buildAll",
+        "org/pitest/quickbuilder/common/Sequences", "buildAll",
         "(Lorg/pitest/quickbuilder/Builder;)Ljava/util/List;", false);
     mv.visitInsn(ARETURN);
     mv.visitMaxs(2, 2);
@@ -652,16 +652,16 @@ class BuilderBuilder {
 
   private void createLimitMethod(final ClassWriter cw) {
     final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "limit",
-        "(I)Lorg/pitest/quickbuilder/sequence/SequenceBuilder;",
-        "(I)Lorg/pitest/quickbuilder/sequence/SequenceBuilder<TT;>;", null);
+        "(I)" + SequenceBuilder.type(),
+        "(I)L" + SequenceBuilder.name() + "<TT;>;", null);
     mv.visitCode();
     mv.visitVarInsn(ALOAD, 0);
     mv.visitVarInsn(ILOAD, 1);
     mv.visitMethodInsn(
         INVOKESTATIC,
-        "org/pitest/quickbuilder/sequence/Sequences",
+        "org/pitest/quickbuilder/common/Sequences",
         "limit",
-        "(Lorg/pitest/quickbuilder/Builder;I)Lorg/pitest/quickbuilder/sequence/SequenceBuilder;",
+        "(Lorg/pitest/quickbuilder/Builder;I)" + SequenceBuilder.type(),
         false);
     mv.visitInsn(ARETURN);
     mv.visitMaxs(2, 2);
@@ -673,7 +673,7 @@ class BuilderBuilder {
     final MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "iterator", "()Ljava/util/Iterator;", "()Ljava/util/Iterator<TT;>;", null);
       mv.visitCode();
       mv.visitVarInsn(ALOAD, 0);
-      mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/sequence/Sequences", "iterator", "(Lorg/pitest/quickbuilder/Builder;)Ljava/util/Iterator;", false);
+      mv.visitMethodInsn(INVOKESTATIC, "org/pitest/quickbuilder/common/Sequences", "iterator", "(Lorg/pitest/quickbuilder/Builder;)Ljava/util/Iterator;", false);
       mv.visitInsn(ARETURN);
       mv.visitMaxs(1, 1);
       mv.visitEnd();   

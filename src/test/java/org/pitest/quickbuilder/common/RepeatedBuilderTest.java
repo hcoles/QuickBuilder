@@ -1,9 +1,11 @@
-package org.pitest.quickbuilder.sequence;
+package org.pitest.quickbuilder.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.pitest.quickbuilder.sequence.ConstantBuilder.constant;
+import static org.pitest.quickbuilder.common.ConstantBuilder.constant;
 
 import org.junit.Test;
+import org.pitest.quickbuilder.SequenceBuilder;
+import org.pitest.quickbuilder.common.RepeatedBuilder;
 
 public class RepeatedBuilderTest {
   

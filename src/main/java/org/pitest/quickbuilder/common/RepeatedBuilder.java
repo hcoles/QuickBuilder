@@ -1,26 +1,31 @@
-package org.pitest.quickbuilder.sequence;
+package org.pitest.quickbuilder.common;
 
 import java.util.Iterator;
 import java.util.List;
 
 import org.pitest.quickbuilder.Builder;
 import org.pitest.quickbuilder.Maybe;
+import org.pitest.quickbuilder.SequenceBuilder;
 
-public class LimitingBuilder<T> implements SequenceBuilder<T> {
+public class RepeatedBuilder<T> implements SequenceBuilder<T> {
 
   private final Builder<T> child;
   private final int        remaining;
 
-  private LimitingBuilder(int times, Builder<T> child) {
+  private RepeatedBuilder(int times, Builder<T> child) {
     remaining = times - 1;
     this.child = child;
   }
 
-  public static <T> SequenceBuilder<T> limit(int times, Builder<T> child) {
-    if ( times <= 0 ) {
+  public static <T> RepeatedBuilder<T> once(Builder<T> child) {
+    return new RepeatedBuilder<T>(1, child);
+  }
+
+  public static <T> SequenceBuilder<T> repeat(int times, Builder<T> child) {
+    if (times <= 0) {
       return new NonBuilder<T>();
     }
-    return new LimitingBuilder<T>(times, child);
+    return new RepeatedBuilder<T>(times, child);
   }
 
   public T build() {
@@ -30,12 +35,12 @@ public class LimitingBuilder<T> implements SequenceBuilder<T> {
   @Override
   public Maybe<Builder<T>> next() {
     if (remaining > 0) {
-      return Maybe.<Builder<T>> some(new LimitingBuilder<T>(
-          remaining, child.next().getOrElse(new NonBuilder<T>())));
+      return Maybe.<Builder<T>> some(new RepeatedBuilder<T>(
+          remaining, child));
     }
     return Maybe.none();
   }
-  
+
   @Override
   public SequenceBuilder<T> limit(int limit) {
     return LimitingBuilder.limit(limit, this);
@@ -55,4 +60,5 @@ public class LimitingBuilder<T> implements SequenceBuilder<T> {
   public Iterator<T> iterator() {
     return Sequences.iterator(this);
   }  
+
 }

@@ -1,4 +1,4 @@
-package org.pitest.quickbuilder.sequence;
+package org.pitest.quickbuilder.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.pitest.quickbuilder.builders.Builders.constant;
@@ -6,6 +6,8 @@ import static org.pitest.quickbuilder.builders.Builders.once;
 import static org.pitest.quickbuilder.builders.Builders.repeat;
 
 import org.junit.Test;
+import org.pitest.quickbuilder.SequenceBuilder;
+import org.pitest.quickbuilder.common.ComposedBuilder;
 
 public class ComposedBuilderTest {
 

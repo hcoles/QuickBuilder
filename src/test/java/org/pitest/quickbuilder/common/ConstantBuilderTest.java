@@ -1,8 +1,10 @@
-package org.pitest.quickbuilder.sequence;
+package org.pitest.quickbuilder.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
+import org.pitest.quickbuilder.common.ConstantBuilder;
+import org.pitest.quickbuilder.common.Sequences;
 
 public class ConstantBuilderTest {
 

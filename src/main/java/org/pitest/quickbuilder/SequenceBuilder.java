@@ -1,8 +1,6 @@
-package org.pitest.quickbuilder.sequence;
+package org.pitest.quickbuilder;
 
 import java.util.List;
-
-import org.pitest.quickbuilder.Builder;
 
 /**
  * A Builder that provides convenience methods for creating sequences of values

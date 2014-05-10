@@ -1,4 +1,4 @@
-package org.pitest.quickbuilder.sequence;
+package org.pitest.quickbuilder.common;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.junit.Test;
+import org.pitest.quickbuilder.common.BuilderIterable;
 
 public class BuilderIterableTest {
 

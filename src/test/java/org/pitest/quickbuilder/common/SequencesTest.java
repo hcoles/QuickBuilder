@@ -1,4 +1,4 @@
-package org.pitest.quickbuilder.sequence;
+package org.pitest.quickbuilder.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -6,8 +6,10 @@ import java.util.Iterator;
 
 import org.junit.Test;
 import org.pitest.quickbuilder.Builder;
+import org.pitest.quickbuilder.SequenceBuilder;
 import org.pitest.quickbuilder.builders.Builders;
 import org.pitest.quickbuilder.builders.QB;
+import org.pitest.quickbuilder.common.Sequences;
 
 import com.example.beans.FruitBean;
 import com.example.beans.FruitBuilder;

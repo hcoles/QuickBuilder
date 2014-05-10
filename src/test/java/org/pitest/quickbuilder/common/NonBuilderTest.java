@@ -1,10 +1,11 @@
-package org.pitest.quickbuilder.sequence;
+package org.pitest.quickbuilder.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 import org.pitest.quickbuilder.Maybe;
 import org.pitest.quickbuilder.NoValueAvailableError;
+import org.pitest.quickbuilder.common.NonBuilder;
 
 public class NonBuilderTest {
   
