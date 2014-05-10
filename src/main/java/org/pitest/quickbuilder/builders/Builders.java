@@ -56,7 +56,7 @@ public class Builders {
   /**
    * Creates a sequence that repeats the given value only once.
    * 
-   * @param builder The value
+   * @param value The value
    * @param<T> Type to build 
    * @return A builder sequence of exactly 1 length
    */
@@ -89,12 +89,10 @@ public class Builders {
   }
   
   /**
-   * Creates a builder that always returns the
-   * same instance of the produced value
+   * Creates a builder that always returns null
    * 
-   * @param builder The builder to supply the value
    * @param<T> Type to build
-   * @return A builder that always returns the same value
+   * @return A builder that always returns null
    */
   public static <T> SequenceBuilder<T> nullValue() {
     return Sequences.decorate(new NullBuilder<T>());

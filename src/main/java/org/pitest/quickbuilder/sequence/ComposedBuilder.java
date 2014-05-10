@@ -17,7 +17,6 @@ public class ComposedBuilder<T> implements SequenceBuilder<T> {
     this.children = children;
   }
 
-  @SafeVarargs
   public static <T> SequenceBuilder<T> compose(Builder<T> ... children ) {
     return make(Arrays.asList(children));
   } 

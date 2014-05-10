@@ -189,6 +189,7 @@ public class TypeScanner<T, B extends Builder<T>> {
   private boolean isPropertyMethod(final Method m) {
     final String name = m.getName();
     return (!name.startsWith(USER_PROPERTY_PREFIX)
+        && !m.getDeclaringClass().equals(Iterable.class)
         && !m.getDeclaringClass().equals(Builder.class)
         && !m.getDeclaringClass().equals(SequenceBuilder.class) && (StringUtils
         .parseCamelCase(name).length > 1));
