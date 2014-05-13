@@ -292,7 +292,9 @@ public class TypeScanner<T, B extends Builder<T>> {
     for (final Method m : builtType.getMethods()) {
       if (m.getName().equals("set" + name)
           && m.getReturnType().equals(Void.TYPE)
-          && (m.getParameterTypes().length == 1)) {
+          && (m.getParameterTypes().length == 1)
+          && (Type.getArgumentTypes(m)[0].equals(type))
+          ) {
         return new Setter("set" + name, type);
       }
     }

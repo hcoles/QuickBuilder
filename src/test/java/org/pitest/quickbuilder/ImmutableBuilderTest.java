@@ -352,6 +352,7 @@ public class ImmutableBuilderTest {
   public void doesNotSupportWildCards() {
     try {
       QB.builder(BuilderDeclaringBoundedWildcardProperty.class);
+      fail("expected an error");
     } catch (final QuickBuilderError e) {
       assertThat(e).hasMessageContaining("wildcards not currently supported");
     }
@@ -361,6 +362,7 @@ public class ImmutableBuilderTest {
   public void shouldThrowErrorWhenUnderScoreMethodHasParameter() {
     try {
       QB.builder(BuilderWithParameterisedUnderscoreMethod.class);
+      fail("expected an error");
     } catch (final QuickBuilderError e) {
       assertThat(e).hasMessageContaining("_Foo should not have parameters");
     }
@@ -370,6 +372,7 @@ public class ImmutableBuilderTest {
   public void shouldThrowErrorWhenTypeOfUnderscoreMethodDoesNotMatchProperty() {
     try {
       QB.builder(BuilderWithTypeMismatchInUnderscoreMethod.class);
+      fail("expected an error");
     } catch (final QuickBuilderError e) {
       assertThat(e).hasMessageContaining("No setter found for Foo of type");
       assertThat(e).hasMessageContaining(BuilderWithTypeMismatchInUnderscoreMethod.class.getName());
@@ -381,6 +384,7 @@ public class ImmutableBuilderTest {
   public void shouldThrowErrorWhenWithMethodDoesNotReturnBuilder() {
     try {
       QB.builder(BuilderWithPropertyReturningWrongType.class);
+      fail("expected an error");
     } catch (final QuickBuilderError e) {
       assertThat(e).hasMessageContaining(
           "should declare return type as "
@@ -392,6 +396,7 @@ public class ImmutableBuilderTest {
   public void shouldThrowErrorWhenWithMethodHasWrongNumberOfParameters() {
     try {
       QB.builder(BuilderWithPropertyWithTooManyParameters.class);
+      fail("expected an error");
     } catch (final QuickBuilderError e) {
       assertThat(e).hasMessageContaining("should take exactly one parameter");
     }
@@ -403,6 +408,7 @@ public class ImmutableBuilderTest {
         new MixedValueGenerator());
     try {
       builder.withF(1.0f).build();
+      fail("expected an error");
     } catch (final NoValueAvailableError e) {
       assertThat(e).hasMessageContaining("no value");
     }
@@ -433,6 +439,7 @@ public class ImmutableBuilderTest {
   public void shouldThrowErrorWhenAskedToImplementInaccessibleInterface() {
     try {
       QB.builder(Inaccessible.class);
+      fail("expected an error");
     } catch (final QuickBuilderError e) {
       assertThat(e).hasMessageContaining(
           "Cannot implement the interface " + Inaccessible.class.getName());
@@ -574,6 +581,20 @@ public class ImmutableBuilderTest {
     assertThat(builder.iterator().next()).isNotNull();
   }
   
+  
+  public static interface MistypedBuilder extends Builder<FruitBean> {
+    MistypedBuilder withName(Builder<Integer> name);
+  }
+  
+  @Test
+  public void shouldReportMistypedBuilderParams() {
+    try {
+      QB.builder(MistypedBuilder.class);
+      fail("Expected an error");
+    } catch (final QuickBuilderError e) {
+      assertThat(e).hasMessageContaining("No setter found for ");
+    }
+  }
   
   private Condition<FruitBean> fruitWithId(final String id) {
     return new Condition<FruitBean>() {
