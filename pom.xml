@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.pitest.quickbuilder</groupId>
 	<artifactId>quickbuilder</artifactId>
-	<version>1.2</version>
+	<version>1.3-SNAPSHOT</version>
 
 	<url>http://pitest.org</url>
 	<description>Generates implementations of the Builder Pattern at runtime.</description>
