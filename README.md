@@ -22,7 +22,7 @@ It's on [maven central](http://search.maven.org/#search|ga|1|a%3A%22quickbuilder
 <dependency>
     <groupId>org.pitest.quickbuilder</groupId>
     <artifactId>quickbuilder</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 </dependency>
 ```
 
@@ -176,7 +176,7 @@ Occasionally you may want to create a series of objects that differ from each ot
 QuickBuilder currently provides one simple sequence implementation that takes it's values from a list that you supply.
 
 ```java
-import static org.pitest.quickbuilder.sequence.ElementSequence.from;
+import static org.pitest.quickbuilder.common.ElementSequence.from;
 import static java.util.Arrays.asList;
 
 interface PersonBuilder extends SequenceBuilder<Person> {
@@ -188,12 +188,13 @@ PersonBuilder person = QB.builder(PersonBuilder.class)
                             .withName(from(asList("Paul", "Barry", "Sarah")))
                             .withAge(from(asList(20,29,42)))
 
-List<Person> people = person.buildAll(); 
+Iterator<Person> people = person.iterator(); 
 
-people.get(0); // a person named Paul with age 20
-people.get(1); // a person named Barry with age 29
-people.get(2); // a person named Sarah with age 42
+people.next(); // a person named Paul with age 20
+people.next(); // a person named Barry with age 29
+people.next(); // a person named Sarah with age 42
 
+people.buildAll() // a list with Paul(20), Barry(29) and Sarah(42)
 people.build(2) // a list with Paul(20) and Barry(29)
 
 ```
@@ -230,9 +231,17 @@ Other approaches you might want to consider
 
 # Releases
 
+## 1.2
+
+* SequenceBuilder implement Iterable<T>
+* Report type mismatch of Builder parameter with methods
+* Composing operations repeat, once, limit, theSame
+* Convience builders integersFrom, nullValue
+* Converting builders 
+
 ## 1.1
 
-Builders immutable when generating sequences
+* Builders immutable when generating sequences
 
 ## 1.0
 
