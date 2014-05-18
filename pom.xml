@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.pitest.quickbuilder</groupId>
 	<artifactId>quickbuilder</artifactId>
-	<version>1.2-SNAPSHOT</version>
+	<version>1.2</version>
 
 	<url>http://pitest.org</url>
 	<description>Generates implementations of the Builder Pattern at runtime.</description>
@@ -114,7 +114,7 @@
                         <configuration>
                             <dependencyDefinition>
                                 show allResults
-                                check absenceOfPackageCycles > 1 in org.pitest.quickbuilder.*
+                                check absenceOfPackageCycles &gt; 1 in org.pitest.quickbuilder.*
                             </dependencyDefinition>
                         </configuration>
                     </execution>
