@@ -194,8 +194,8 @@ people.next(); // a person named Paul with age 20
 people.next(); // a person named Barry with age 29
 people.next(); // a person named Sarah with age 42
 
-people.buildAll() // a list with Paul(20), Barry(29) and Sarah(42)
-people.build(2) // a list with Paul(20) and Barry(29)
+person.buildAll() // a list with Paul(20), Barry(29) and Sarah(42)
+person.build(2) // a list with Paul(20) and Barry(29)
 
 ```
 Notice that the SequenceBuilders are also immutable.
